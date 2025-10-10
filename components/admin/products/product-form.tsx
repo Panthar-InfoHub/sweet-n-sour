@@ -23,8 +23,8 @@ import { createProduct, updateProduct } from "@/actions/product.actions";
 import { getCategories } from "@/actions/category.actions";
 import { ArrowLeft, Plus, X, Loader2, Package } from "lucide-react";
 import Link from "next/link";
-import { productSchema, type ProductFormData, type ProductVariant } from "@/lib/zod-schema";
-import { MediaSection } from "./media-section";
+import { productSchema, type ProductFormData } from "@/lib/zod-schema";
+import { MediaSection } from "@/components/admin/shared/media-section";
 
 interface Category {
   id: string;

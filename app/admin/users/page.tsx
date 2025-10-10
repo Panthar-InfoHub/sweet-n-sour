@@ -1,4 +1,4 @@
-import { UsersTable } from "@/components/admin/users-table";
+import { UsersTable } from "@/components/admin/customer/users-table";
 import { getUsers } from "@/actions/user.actions";
 
 export default async function AdminUsersPage() {

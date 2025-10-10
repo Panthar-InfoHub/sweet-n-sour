@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { CategoriesTable } from "@/components/admin/categories-table";
+import { CategoriesTable } from "@/components/admin/category/categories-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";

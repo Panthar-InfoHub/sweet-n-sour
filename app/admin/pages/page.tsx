@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 
-import { PagesTable } from "@/components/admin/pages-table"
+import { PagesTable } from "@/components/admin/cms/pages-table"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"

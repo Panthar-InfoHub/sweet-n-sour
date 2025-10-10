@@ -22,8 +22,8 @@ import {
 import { MoreHorizontal, Pencil, Trash2, Package, Star, TrendingUp, Tag } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { DeleteConfirmDialog } from "./delete-confirm-dialog";
-import { StockDialog } from "./stock-dialog";
+import { DeleteConfirmDialog } from "@/components/admin/shared/delete-confirm-dialog";
+import { StockDialog } from "@/components/admin/products/stock-dialog";
 import {
   getProducts,
   deleteProduct,

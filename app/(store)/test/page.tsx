@@ -1,5 +1,5 @@
-"use client"
-import { MediaSection } from "@/components/admin/media-section";
+"use client";
+import { MediaSection } from "@/components/admin/shared/media-section";
 import React, { useState } from "react";
 
 const page = () => {

@@ -14,7 +14,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { usePathname } from "next/navigation";
-import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { AdminSidebar } from "@/components/admin/shared/admin-sidebar";
 
 interface AdminLayoutProps {
   children: ReactNode;

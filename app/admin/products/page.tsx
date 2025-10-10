@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import { ProductsTable } from "@/components/admin/products-table";
+import { ProductsTable } from "@/components/admin/products/products-table";
 
 export default function AdminProductsPage() {
   return (

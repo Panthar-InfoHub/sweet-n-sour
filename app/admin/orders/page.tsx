@@ -1,4 +1,4 @@
-import { OrdersTable } from "@/components/admin/orders-table";
+import { OrdersTable } from "@/components/admin/orders/orders-table";
 import { getOrders } from "@/actions/order.actions";
 
 export default async function AdminOrdersPage() {

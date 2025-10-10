@@ -1,10 +1,10 @@
 
-import { DashboardStats } from "@/components/admin/dashboard-stats"
-import { RevenueAreaChart } from "@/components/admin/revenue-area-chart"
-import { OrdersBarChart } from "@/components/admin/orders-bar-chart"
-import { CategoryPieChart } from "@/components/admin/category-pie-chart"
-import { RecentOrders } from "@/components/admin/recent-orders"
-import { TopProducts } from "@/components/admin/top-products"
+import { DashboardStats } from "@/components/admin/dashboard/dashboard-stats"
+import { RevenueAreaChart } from "@/components/admin/dashboard/revenue-area-chart"
+import { OrdersBarChart } from "@/components/admin/dashboard/orders-bar-chart"
+import { CategoryPieChart } from "@/components/admin/dashboard/category-pie-chart"
+import { RecentOrders } from "@/components/admin/dashboard/recent-orders"
+import { TopProducts } from "@/components/admin/dashboard/top-products"
 
 export default function AdminDashboardPage() {
   return (

@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Pencil, Eye, Trash2 } from "lucide-react";
 import { formatDate } from "@/utils/format";
-import { PageEditorDialog } from "./page-editor-dialog";
-import { DeleteConfirmDialog } from "./delete-confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/admin/shared/delete-confirm-dialog";
+import { PageEditorDialog } from "@/components/admin/cms/page-editor-dialog";
 
 const MOCK_PAGES = [
   {
