@@ -265,35 +265,6 @@ export async function updateVariantStock(
   }
 }
 
-// Legacy function - keeping for backward compatibility
-export async function updateProductStock(id: string, stockQuantity: number) {
-  try {
-    if (stockQuantity < 0) {
-      return { success: false, error: "Stock quantity cannot be negative" };
-    }
-
-    const product = await prisma.product.findUnique({
-      where: { id },
-    });
-
-    if (!product) {
-      return { success: false, error: "Product not found" };
-    }
-
-    // Update first variant stock if exists
-    const variants = Array.isArray(product.variants) ? product.variants : [];
-    if (variants.length > 0) {
-      return updateVariantStock(id, 0, stockQuantity);
-    }
-
-    revalidatePath("/admin/products");
-    return { success: true, data: product };
-  } catch (error) {
-    console.error("Error updating product stock:", error);
-    return { success: false, error: "Failed to update stock" };
-  }
-}
-
 // Toggle product featured status
 export async function toggleProductFeatured(id: string) {
   try {

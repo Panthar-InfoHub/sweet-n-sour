@@ -11,75 +11,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Ban, CheckCircle } from "lucide-react";
+import { Eye } from "lucide-react";
 import { formatDate } from "@/utils/format";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserDetailsDialog } from "./user-details-dialog";
+import { USER_ROLE } from "@/prisma/generated/prisma";
 
-const MOCK_USERS = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    role: "customer",
-    status: "active",
-    joinedDate: new Date("2025-01-15"),
-    totalOrders: 12,
-    totalSpent: 5988,
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "customer",
-    status: "active",
-    joinedDate: new Date("2025-02-20"),
-    totalOrders: 8,
-    totalSpent: 3992,
-  },
-  {
-    id: "3",
-    name: "Bob Johnson",
-    email: "bob@example.com",
-    role: "admin",
-    status: "active",
-    joinedDate: new Date("2024-12-01"),
-    totalOrders: 0,
-    totalSpent: 0,
-  },
-  {
-    id: "4",
-    name: "Alice Williams",
-    email: "alice@example.com",
-    role: "customer",
-    status: "inactive",
-    joinedDate: new Date("2025-03-10"),
-    totalOrders: 2,
-    totalSpent: 998,
-  },
-];
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: USER_ROLE;
+  createdAt: Date;
+  totalOrders: number;
+  totalSpent: number;
+}
 
-export function UsersTable() {
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+interface UsersTableProps {
+  users: User[];
+}
+
+export function UsersTable({ users }: UsersTableProps) {
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  const handleViewDetails = (user: any) => {
-    setSelectedUser(user);
+  const handleViewDetails = (userId: string) => {
+    setSelectedUserId(userId);
     setIsDetailsOpen(true);
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
   };
 
   return (
@@ -88,79 +45,53 @@ export function UsersTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>User</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead>Joined</TableHead>
               <TableHead>Orders</TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
+              <TableHead className="w-[80px]">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {MOCK_USERS.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium">{user.name}</div>
-                      <div className="text-sm text-muted-foreground">{user.email}</div>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={user.role === "admin" ? "default" : "secondary"}
-                    className="capitalize"
-                  >
-                    {user.role}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={user.status === "active" ? "default" : "secondary"}
-                    className="capitalize"
-                  >
-                    {user.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>{formatDate(user.joinedDate)}</TableCell>
-                <TableCell>{user.totalOrders} orders</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleViewDetails(user)}>
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Details
-                      </DropdownMenuItem>
-                      {user.status === "active" ? (
-                        <DropdownMenuItem className="text-destructive">
-                          <Ban className="h-4 w-4 mr-2" />
-                          Deactivate
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem>
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Activate
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                  No users found
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={user.role === USER_ROLE.ADMIN ? "default" : "secondary"}
+                      className="capitalize"
+                    >
+                      {user.role.toLowerCase()}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{formatDate(user.createdAt)}</TableCell>
+                  <TableCell>{user.totalOrders}</TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon" onClick={() => handleViewDetails(user.id)}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
 
-      <UserDetailsDialog user={selectedUser} open={isDetailsOpen} onOpenChange={setIsDetailsOpen} />
+      <UserDetailsDialog
+        userId={selectedUserId}
+        open={isDetailsOpen}
+        onOpenChange={setIsDetailsOpen}
+      />
     </>
   );
 }

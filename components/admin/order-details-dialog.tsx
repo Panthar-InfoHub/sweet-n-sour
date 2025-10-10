@@ -1,109 +1,240 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDate } from "@/utils/format";
-import { Package, MapPin, CreditCard } from "lucide-react";
+import { Package, MapPin, CreditCard, User } from "lucide-react";
+import { getOrder } from "@/actions/order.actions";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { OrderStatus } from "@/prisma/generated/prisma";
+import Image from "next/image";
 
 interface OrderDetailsDialogProps {
-  order?: any;
+  orderId: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function OrderDetailsDialog({ order, open, onOpenChange }: OrderDetailsDialogProps) {
-  if (!order) return null;
+interface OrderDetails {
+  id: string;
+  orderNumber: string;
+  createdAt: Date;
+  status: OrderStatus;
+  subtotal: number;
+  tax: number;
+  shipping: number;
+  total: number;
+  shippingAddress: any;
+  billingAddress: any;
+  paymentMethod: string;
+  paymentStatus: string;
+  notes: string | null;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    image: string | null;
+  };
+  items: Array<{
+    id: string;
+    name: string;
+    quantity: number;
+    image: string | null;
+    variantDetails: any;
+    product: {
+      id: string;
+      name: string;
+      images: string[];
+      slug: string;
+    };
+  }>;
+}
+
+const getStatusColor = (status: OrderStatus) => {
+  switch (status) {
+    case "PENDING":
+      return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400";
+    case "PROCESSING":
+      return "bg-blue-500/10 text-blue-700 dark:text-blue-400";
+    case "SHIPPED":
+      return "bg-purple-500/10 text-purple-700 dark:text-purple-400";
+    case "DELIVERED":
+      return "bg-green-500/10 text-green-700 dark:text-green-400";
+    case "CANCELLED":
+      return "bg-red-500/10 text-red-700 dark:text-red-400";
+    default:
+      return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+  }
+};
+
+export function OrderDetailsDialog({ orderId, open, onOpenChange }: OrderDetailsDialogProps) {
+  const [order, setOrder] = useState<OrderDetails | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (orderId && open) {
+      setLoading(true);
+      getOrder(orderId).then((result) => {
+        if (result.success && result.data) {
+          setOrder(result.data as OrderDetails);
+        }
+        setLoading(false);
+      });
+    }
+  }, [orderId, open]);
+
+  if (!open) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Order Details - {order.id}</DialogTitle>
+          <DialogTitle>Order Details - {order?.orderNumber || ""}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Order Date</p>
-              <p className="font-medium">{formatDate(order.date)}</p>
-            </div>
-            <Badge variant="secondary" className="capitalize">
-              {order.status}
-            </Badge>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <LoadingSpinner />
           </div>
-
-          <Separator />
-
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Package className="h-4 w-4" />
-              <h3 className="font-semibold">Order Items</h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <div>
-                  <p className="font-medium">Mango Pickle</p>
-                  <p className="text-sm text-muted-foreground">500g × 2</p>
-                </div>
-                <p className="font-medium">{formatCurrency(998)}</p>
+        ) : order ? (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Order Date</p>
+                <p className="font-medium">{formatDate(order.createdAt)}</p>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <div>
-                  <p className="font-medium">Red Chilli Pickle</p>
-                  <p className="text-sm text-muted-foreground">250g × 1</p>
-                </div>
-                <p className="font-medium">{formatCurrency(499)}</p>
-              </div>
+              <Badge variant="secondary" className={getStatusColor(order.status)}>
+                {order.status.toLowerCase()}
+              </Badge>
             </div>
-          </div>
 
-          <Separator />
-
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <MapPin className="h-4 w-4" />
-              <h3 className="font-semibold">Shipping Address</h3>
-            </div>
-            <div className="p-3 rounded-lg bg-muted/50">
-              <p className="font-medium">{order.customer.name}</p>
-              <p className="text-sm text-muted-foreground mt-1">123 Main Street</p>
-              <p className="text-sm text-muted-foreground">New York, NY 10001</p>
-              <p className="text-sm text-muted-foreground">United States</p>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <CreditCard className="h-4 w-4" />
-              <h3 className="font-semibold">Payment Information</h3>
-            </div>
-            <div className="p-3 rounded-lg bg-muted/50">
-              <p className="text-sm text-muted-foreground">Payment Method</p>
-              <p className="font-medium">Credit Card ending in 4242</p>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>{formatCurrency(order.total - 50)}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Shipping</span>
-              <span>{formatCurrency(50)}</span>
-            </div>
             <Separator />
-            <div className="flex items-center justify-between font-semibold text-lg">
-              <span>Total</span>
-              <span>{formatCurrency(order.total)}</span>
+
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <User className="h-4 w-4" />
+                <h3 className="font-semibold">Customer</h3>
+              </div>
+              <div className="p-3 rounded-lg bg-muted/50">
+                <p className="font-medium">{order.user.name}</p>
+                <p className="text-sm text-muted-foreground">{order.user.email}</p>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Package className="h-4 w-4" />
+                <h3 className="font-semibold">Order Items</h3>
+              </div>
+              <div className="space-y-3">
+                {order.items.map((item) => {
+                  const variantDetails = item.variantDetails as { weight: string; price: number };
+                  const itemTotal = variantDetails.price * item.quantity;
+                  return (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+                    >
+                      {item.image && (
+                        <div className="relative w-12 h-12 rounded overflow-hidden flex-shrink-0">
+                          <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {variantDetails.weight} × {item.quantity}
+                        </p>
+                      </div>
+                      <p className="font-medium">{formatCurrency(itemTotal)}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="h-4 w-4" />
+                <h3 className="font-semibold">Shipping Address</h3>
+              </div>
+              <div className="p-3 rounded-lg bg-muted/50">
+                <p className="font-medium">{order.shippingAddress.fullName}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {order.shippingAddress.address}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
+                  {order.shippingAddress.postalCode}
+                </p>
+                <p className="text-sm text-muted-foreground">{order.shippingAddress.country}</p>
+                {order.shippingAddress.phone && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Phone: {order.shippingAddress.phone}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <CreditCard className="h-4 w-4" />
+                <h3 className="font-semibold">Payment Information</h3>
+              </div>
+              <div className="p-3 rounded-lg bg-muted/50">
+                <p className="text-sm text-muted-foreground">Payment Method</p>
+                <p className="font-medium capitalize">{order.paymentMethod}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Status: <span className="capitalize font-medium">{order.paymentStatus}</span>
+                </p>
+              </div>
+            </div>
+
+            {order.notes && (
+              <>
+                <Separator />
+                <div>
+                  <h3 className="font-semibold mb-2">Order Notes</h3>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <p className="text-sm">{order.notes}</p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <Separator />
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span>{formatCurrency(order.subtotal)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Tax</span>
+                <span>{formatCurrency(order.tax)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Shipping</span>
+                <span>{formatCurrency(order.shipping)}</span>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between font-semibold text-lg">
+                <span>Total</span>
+                <span>{formatCurrency(order.total)}</span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">Order not found</div>
+        )}
       </DialogContent>
     </Dialog>
   );
