@@ -1,7 +1,7 @@
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { LeafDecoration } from "@/components/decorative/leaf-decoration"
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { LeafDecoration } from "@/components/decorative/leaf-decoration";
 
 export function HeroSection() {
   return (
@@ -17,8 +17,8 @@ export function HeroSection() {
               Authentic Handcrafted Pickles
             </h1>
             <p className="text-lg text-foreground-muted mb-8 text-pretty max-w-xl mx-auto lg:mx-0">
-              Experience the rich flavors of traditional Indian pickles, made with love and the finest ingredients. Each
-              jar tells a story of heritage and taste.
+              Experience the rich flavors of traditional Indian pickles, made with love and the
+              finest ingredients. Each jar tells a story of heritage and taste.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button size="lg" className="bg-primary hover:bg-primary-hover" asChild>
@@ -34,12 +34,23 @@ export function HeroSection() {
           <div className="relative h-[400px] md:h-[500px]">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-80 md:h-80 bg-white rounded-full shadow-2xl flex items-center justify-center z-10">
               <div className="relative w-48 h-48 md:w-56 md:h-56">
-                <Image src="/mango-pickle-jar.png" alt="Mango Pickle" fill className="object-contain" priority />
+                <Image
+                  src="/mango-pickle-jar.png"
+                  alt="Mango Pickle"
+                  fill
+                  className="object-contain"
+                  priority
+                />
               </div>
             </div>
             <div className="absolute top-0 right-0 w-48 h-48 md:w-56 md:h-56 bg-white rounded-full shadow-xl flex items-center justify-center">
               <div className="relative w-32 h-32 md:w-40 md:h-40">
-                <Image src="/mango-pickle-jar.png" alt="Chilli Pickle" fill className="object-contain" />
+                <Image
+                  src="/mango-pickle-jar.png"
+                  alt="Chilli Pickle"
+                  fill
+                  className="object-contain"
+                />
               </div>
               <div className="absolute -top-2 -right-2 bg-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
                 NEW
@@ -49,5 +60,5 @@ export function HeroSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
