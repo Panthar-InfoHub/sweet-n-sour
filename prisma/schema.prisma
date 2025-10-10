@@ -30,6 +30,7 @@ model User {
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
+  orders        Order[]
 
   @@unique([email])
   @@map("user")
@@ -78,4 +79,100 @@ model Verification {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("verification")
+}
+
+// E-commerce Models
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@map("category")
+}
+
+model Product {
+  id              String        @id @default(cuid())
+  name            String
+  slug            String        @unique
+  description     String
+  images          String[]      @default([])
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  variants        Json          // Array of {weight, price, compareAtPrice, stockQuantity, inStock}
+  isFeatured      Boolean       @default(false)
+  isBestSeller    Boolean       @default(false)
+  isOnSale        Boolean       @default(false)
+  tags            String[]      @default([])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  orderItems      OrderItem[]
+
+  @@map("product")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status          OrderStatus @default(PENDING)
+  subtotal        Float
+  tax             Float
+  shipping        Float
+  total           Float
+  shippingAddress Json
+  billingAddress  Json
+  paymentMethod   String
+  paymentStatus   String      @default("pending")
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  items           OrderItem[]
+
+  @@map("order")
+}
+
+model OrderItem {
+  id              String   @id @default(cuid())
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
+  name            String
+  variantDetails  Json     // {weight, price, compareAtPrice}
+  quantity        Int
+  image           String?
+  createdAt       DateTime @default(now())
+
+  @@map("order_item")
+}
+
+model CMSPage {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  content         String
+  metaTitle       String?
+  metaDescription String?
+  isPublished     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("cms_page")
 }

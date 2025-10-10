@@ -1,7 +1,7 @@
 // Utility functions for formatting
 
 export function formatPrice(price: number): string {
-  return `₹${price.toLocaleString("en-IN")}`
+  return `₹${(price||0).toLocaleString("en-IN")}`
 }
 
 export function formatCurrency(price: number): string {

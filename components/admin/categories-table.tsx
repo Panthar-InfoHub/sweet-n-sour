@@ -1,71 +1,117 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
-import Image from "next/image"
-import { CategoryDialog } from "./category-dialog"
-import { DeleteConfirmDialog } from "./delete-confirm-dialog"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { getSignedViewUrl } from "@/lib/cloud-storage";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import Image from "next/image";
+import { DeleteConfirmDialog } from "./delete-confirm-dialog";
+import { getCategories, deleteCategory } from "@/actions/category.actions";
+import { toast } from "sonner";
 
-const MOCK_CATEGORIES = [
-  {
-    id: "1",
-    name: "Pickles",
-    slug: "pickles",
-    image: "/pickle-jar.jpg",
-    productCount: 12,
-    isActive: true,
-  },
-  {
-    id: "2",
-    name: "Red Chilli",
-    slug: "red-chilli",
-    image: "/red-chilli.jpg",
-    productCount: 8,
-    isActive: true,
-  },
-  {
-    id: "3",
-    name: "Mango",
-    slug: "mango",
-    image: "/ripe-mango.png",
-    productCount: 15,
-    isActive: true,
-  },
-  {
-    id: "4",
-    name: "Green Chilli",
-    slug: "green-chilli",
-    image: "/green-chilli.jpg",
-    productCount: 6,
-    isActive: false,
-  },
-]
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  image: string | null;
+  productCount: number;
+  isActive: boolean;
+}
 
 export function CategoriesTable() {
-  const [selectedCategory, setSelectedCategory] = useState<any>(null)
-  const [isEditOpen, setIsEditOpen] = useState(false)
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [categoryToDelete, setCategoryToDelete] = useState<any>(null)
+  const router = useRouter();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
 
-  const handleEdit = (category: any) => {
-    setSelectedCategory(category)
-    setIsEditOpen(true)
+  const fetchCategories = async () => {
+    setIsLoading(true);
+    const result = await getCategories();
+    if (result.success && result.data) {
+      setCategories(result.data as any);
+
+      // Fetch signed URLs for all category images
+      const urls: Record<string, string> = {};
+      await Promise.all(
+        (result.data as any).map(async (category: Category) => {
+          if (category.image) {
+            try {
+              const signedUrl = await getSignedViewUrl(category.image);
+              urls[category.id] = signedUrl;
+            } catch (error) {
+              console.error("Error fetching signed URL:", error);
+            }
+          }
+        })
+      );
+      setSignedUrls(urls);
+    } else {
+      toast.error(result.error || "Failed to fetch categories");
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const handleEdit = (category: Category) => {
+    router.push(`/admin/categories/${category.slug}`);
+  };
+
+  const handleDelete = (category: Category) => {
+    setCategoryToDelete(category);
+    setIsDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!categoryToDelete) return;
+
+    const result = await deleteCategory(categoryToDelete.id);
+    if (result.success) {
+      toast.success("Category deleted successfully");
+      fetchCategories();
+    } else {
+      toast.error(result.error || "Failed to delete category");
+    }
+    setIsDeleteOpen(false);
+    setCategoryToDelete(null);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border bg-card p-8 text-center">
+        <p className="text-muted-foreground">Loading categories...</p>
+      </div>
+    );
   }
 
-  const handleDelete = (category: any) => {
-    setCategoryToDelete(category)
-    setIsDeleteOpen(true)
-  }
-
-  const confirmDelete = () => {
-    console.log("[v0] Deleting category:", categoryToDelete)
-    // Backend logic will go here
-    setIsDeleteOpen(false)
-    setCategoryToDelete(null)
+  if (categories.length === 0) {
+    return (
+      <div className="rounded-lg border bg-card p-8 text-center">
+        <p className="text-muted-foreground">
+          No categories found. Create your first category to get started.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -83,12 +129,12 @@ export function CategoriesTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {MOCK_CATEGORIES.map((category) => (
+            {categories.map((category) => (
               <TableRow key={category.id}>
                 <TableCell>
-                  <div className="relative h-12 w-12 rounded-md overflow-hidden">
+                  <div className="relative h-12 w-12 rounded-md overflow-hidden bg-muted">
                     <Image
-                      src={category.image || "/placeholder.svg"}
+                      src={signedUrls[category.id] || "/placeholder.svg"}
                       alt={category.name}
                       fill
                       className="object-cover"
@@ -99,7 +145,7 @@ export function CategoriesTable() {
                 <TableCell className="text-muted-foreground">{category.slug}</TableCell>
                 <TableCell>{category.productCount} products</TableCell>
                 <TableCell>
-                  <Badge variant={category.isActive ? "default" : "secondary"}>
+                  <Badge variant={category.isActive ? "outline" : "secondary"}>
                     {category.isActive ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
@@ -115,7 +161,10 @@ export function CategoriesTable() {
                         <Pencil className="h-4 w-4 mr-2" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDelete(category)} className="text-destructive">
+                      <DropdownMenuItem
+                        onClick={() => handleDelete(category)}
+                        className="text-destructive"
+                      >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete
                       </DropdownMenuItem>
@@ -128,8 +177,6 @@ export function CategoriesTable() {
         </Table>
       </div>
 
-      <CategoryDialog category={selectedCategory} open={isEditOpen} onOpenChange={setIsEditOpen} />
-
       <DeleteConfirmDialog
         open={isDeleteOpen}
         onOpenChange={setIsDeleteOpen}
@@ -138,5 +185,5 @@ export function CategoriesTable() {
         description={`Are you sure you want to delete "${categoryToDelete?.name}"? This will affect ${categoryToDelete?.productCount} products.`}
       />
     </>
-  )
+  );
 }

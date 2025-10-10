@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-
 import { UsersTable } from "@/components/admin/users-table";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";

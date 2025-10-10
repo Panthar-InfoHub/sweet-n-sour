@@ -1,6 +1,7 @@
 import type React from "react";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="min-h-screen bg-background text-foreground" suppressHydrationWarning>
         {children}
+        <Toaster />
       </body>
     </html>
   );

@@ -1,9 +1,15 @@
-import React from 'react'
+"use client"
+import { MediaSection } from "@/components/admin/media-section";
+import React, { useState } from "react";
 
 const page = () => {
-  return (
-    <div>page</div>
-  )
-}
+  const [media, setMedia] = useState<string[]>([]);
 
-export default page
+  return (
+    <div>
+      <MediaSection media={media} onChange={setMedia} maxFiles={8} />
+    </div>
+  );
+};
+
+export default page;

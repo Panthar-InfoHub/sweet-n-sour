@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import React from "react"
+import React from "react";
 
-import type { ReactNode } from "react"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
+import type { ReactNode } from "react";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,24 +12,24 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { usePathname } from "next/navigation"
-import { AdminSidebar } from "@/components/admin/admin-sidebar"
+} from "@/components/ui/breadcrumb";
+import { usePathname } from "next/navigation";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 
 interface AdminLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
-export function AdminLayout({ children }: AdminLayoutProps) {
-  const pathname = usePathname()
+export default function AdminLayout({ children }: AdminLayoutProps) {
+  const pathname = usePathname();
 
   // Generate breadcrumbs from pathname
-  const pathSegments = pathname.split("/").filter(Boolean)
+  const pathSegments = pathname.split("/").filter(Boolean);
   const breadcrumbs = pathSegments.map((segment, index) => {
-    const href = "/" + pathSegments.slice(0, index + 1).join("/")
-    const label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ")
-    return { href, label }
-  })
+    const href = "/" + pathSegments.slice(0, index + 1).join("/");
+    const label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
+    return { href, label };
+  });
 
   return (
     <SidebarProvider>
@@ -62,5 +62,5 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex flex-1 flex-col gap-4 p-4 md:p-6 lg:p-8">{children}</div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }
