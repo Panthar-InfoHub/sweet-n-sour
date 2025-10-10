@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { AdminLayout } from "@/components/admin/admin-layout"
+
 import { OrdersTable } from "@/components/admin/orders-table"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function AdminOrdersPage() {
   return (
-    <AdminLayout>
+
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Orders</h1>
@@ -39,6 +39,5 @@ export default function AdminOrdersPage() {
           <OrdersTable />
         </Suspense>
       </div>
-    </AdminLayout>
   )
 }

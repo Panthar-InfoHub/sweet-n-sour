@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { AdminLayout } from "@/components/admin/admin-layout"
+
 import { PagesTable } from "@/components/admin/pages-table"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
@@ -7,7 +7,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export default function AdminPagesPage() {
   return (
-    <AdminLayout>
+
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -24,6 +24,6 @@ export default function AdminPagesPage() {
           <PagesTable />
         </Suspense>
       </div>
-    </AdminLayout>
+
   )
 }

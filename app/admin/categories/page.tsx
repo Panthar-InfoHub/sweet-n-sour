@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { AdminLayout } from "@/components/admin/admin-layout"
+
 import { CategoriesTable } from "@/components/admin/categories-table"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
@@ -7,7 +7,6 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export default function AdminCategoriesPage() {
   return (
-    <AdminLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -24,6 +23,5 @@ export default function AdminCategoriesPage() {
           <CategoriesTable />
         </Suspense>
       </div>
-    </AdminLayout>
   )
 }

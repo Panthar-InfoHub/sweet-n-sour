@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { AdminLayout } from "@/components/admin/admin-layout"
+
 import { ProductsTable } from "@/components/admin/products-table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,7 +8,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export default function AdminProductsPage() {
   return (
-    <AdminLayout>
+
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -32,6 +32,6 @@ export default function AdminProductsPage() {
           <ProductsTable />
         </Suspense>
       </div>
-    </AdminLayout>
+
   )
 }

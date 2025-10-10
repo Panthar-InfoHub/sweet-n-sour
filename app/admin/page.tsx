@@ -1,4 +1,4 @@
-import { AdminLayout } from "@/components/admin/admin-layout"
+
 import { DashboardStats } from "@/components/admin/dashboard-stats"
 import { RevenueAreaChart } from "@/components/admin/revenue-area-chart"
 import { OrdersBarChart } from "@/components/admin/orders-bar-chart"
@@ -8,7 +8,6 @@ import { TopProducts } from "@/components/admin/top-products"
 
 export default function AdminDashboardPage() {
   return (
-    <AdminLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -29,6 +28,5 @@ export default function AdminDashboardPage() {
           <RecentOrders />
         </div>
       </div>
-    </AdminLayout>
   )
 }
