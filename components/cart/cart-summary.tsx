@@ -3,17 +3,15 @@
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { formatPrice } from "@/utils/format";
-import { FREE_SHIPPING_THRESHOLD } from "@/lib/constants";
-import { CheckoutDrawer } from "@/components/checkout/checkout-drawer";
-import { useState } from "react";
+import { FREE_SHIPPING_THRESHOLD } from "@/utils/constants";
 import { Truck } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function CartSummary() {
-  const { getSubtotal, getTax, getShipping, getTotal } = useCart();
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const router = useRouter();
+  const { getSubtotal, getShipping, getTotal } = useCart();
 
   const subtotal = getSubtotal();
-  const tax = getTax();
   const shipping = getShipping();
   const total = getTotal();
   const freeShippingProgress = (subtotal / FREE_SHIPPING_THRESHOLD) * 100;
@@ -50,10 +48,6 @@ export function CartSummary() {
             <span className="font-medium">{formatPrice(subtotal)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-foreground-muted">Tax (8%)</span>
-            <span className="font-medium">{formatPrice(tax)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
             <span className="text-foreground-muted">Shipping</span>
             <span className="font-medium">{shipping === 0 ? "FREE" : formatPrice(shipping)}</span>
           </div>
@@ -67,7 +61,7 @@ export function CartSummary() {
         <Button
           className="w-full bg-primary hover:bg-primary-hover"
           size="lg"
-          onClick={() => setIsCheckoutOpen(true)}
+          onClick={() => router.push("/checkout")}
         >
           Proceed to Checkout
         </Button>
@@ -77,9 +71,6 @@ export function CartSummary() {
           <a href="/products">Continue Shopping</a>
         </Button>
       </div>
-
-      {/* Checkout Drawer */}
-      <CheckoutDrawer open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen} />
     </>
   );
 }

@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { usePathname } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/shared/admin-sidebar";
+import SignOut from "@/components/shared/sign-out";
+import ThemeToggle from "@/components/admin/shared/theme-toggle";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -35,30 +37,42 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     <SidebarProvider>
       <AdminSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              {breadcrumbs.map((crumb, index) => (
-                <React.Fragment key={crumb.href}>
-                  {index === breadcrumbs.length - 1 ? (
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  ) : (
-                    <>
+        <header className="flex h-16 w-full items-center justify-between gap-2 border-b px-4">
+          <div className="flex items-center gap-2 min-w-0">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Breadcrumb className="truncate">
+              <BreadcrumbList>
+                {breadcrumbs.map((crumb, index) => (
+                  <React.Fragment key={crumb.href}>
+                    {index === breadcrumbs.length - 1 ? (
                       <BreadcrumbItem>
-                        <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
+                        <BreadcrumbPage className="truncate max-w-[160px]">
+                          {crumb.label}
+                        </BreadcrumbPage>
                       </BreadcrumbItem>
-                      <BreadcrumbSeparator />
-                    </>
-                  )}
-                </React.Fragment>
-              ))}
-            </BreadcrumbList>
-          </Breadcrumb>
+                    ) : (
+                      <>
+                        <BreadcrumbItem>
+                          <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                      </>
+                    )}
+                  </React.Fragment>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <div className="flex items-center">
+              <SignOut className="h-9 px-3 py-0 text-sm" /> {/* ✅ Normalize button height */}
+            </div>
+          </div>
         </header>
+
         <div className="flex flex-1 flex-col gap-4 p-4 md:p-6 lg:p-8">{children}</div>
       </SidebarInset>
     </SidebarProvider>

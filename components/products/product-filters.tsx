@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Star } from "lucide-react"
-import { MOCK_CATEGORIES } from "@/lib/constants"
+import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Star } from "lucide-react";
+import { MOCK_CATEGORIES } from "@/utils/constants";
 
 export function ProductFilters() {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [selectedRating, setSelectedRating] = useState<string>("")
-  const [availability, setAvailability] = useState<string[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedRating, setSelectedRating] = useState<string>("");
+  const [availability, setAvailability] = useState<string[]>([]);
 
   return (
     <div className="bg-white rounded-lg border border-border p-6 sticky top-24">
@@ -27,9 +27,9 @@ export function ProductFilters() {
                 checked={selectedCategories.includes(category.id)}
                 onCheckedChange={(checked) => {
                   if (checked) {
-                    setSelectedCategories([...selectedCategories, category.id])
+                    setSelectedCategories([...selectedCategories, category.id]);
                   } else {
-                    setSelectedCategories(selectedCategories.filter((id) => id !== category.id))
+                    setSelectedCategories(selectedCategories.filter((id) => id !== category.id));
                   }
                 }}
               />
@@ -48,12 +48,17 @@ export function ProductFilters() {
           {[5, 4, 3, 2, 1].map((rating) => (
             <div key={rating} className="flex items-center space-x-2">
               <RadioGroupItem value={rating.toString()} id={`rating-${rating}`} />
-              <Label htmlFor={`rating-${rating}`} className="flex items-center gap-1 cursor-pointer">
+              <Label
+                htmlFor={`rating-${rating}`}
+                className="flex items-center gap-1 cursor-pointer"
+              >
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-3 w-3 ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                      className={`h-3 w-3 ${
+                        i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                      }`}
                     />
                   ))}
                 </div>
@@ -74,9 +79,9 @@ export function ProductFilters() {
               checked={availability.includes("in-stock")}
               onCheckedChange={(checked) => {
                 if (checked) {
-                  setAvailability([...availability, "in-stock"])
+                  setAvailability([...availability, "in-stock"]);
                 } else {
-                  setAvailability(availability.filter((item) => item !== "in-stock"))
+                  setAvailability(availability.filter((item) => item !== "in-stock"));
                 }
               }}
             />
@@ -90,9 +95,9 @@ export function ProductFilters() {
               checked={availability.includes("out-of-stock")}
               onCheckedChange={(checked) => {
                 if (checked) {
-                  setAvailability([...availability, "out-of-stock"])
+                  setAvailability([...availability, "out-of-stock"]);
                 } else {
-                  setAvailability(availability.filter((item) => item !== "out-of-stock"))
+                  setAvailability(availability.filter((item) => item !== "out-of-stock"));
                 }
               }}
             />
@@ -103,5 +108,5 @@ export function ProductFilters() {
         </div>
       </div>
     </div>
-  )
+  );
 }

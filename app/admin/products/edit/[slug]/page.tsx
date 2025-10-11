@@ -1,5 +1,5 @@
 import { ProductForm } from "@/components/admin/products/product-form";
-import { getProductBySlug } from "@/actions/product.actions";
+import { getProductBySlug } from "@/actions/admin/product.actions";
 import { notFound } from "next/navigation";
 
 export default async function EditProductPage({ params }: { params: Promise<{ slug: string }> }) {

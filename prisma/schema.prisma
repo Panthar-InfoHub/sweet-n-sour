@@ -20,17 +20,19 @@ enum USER_ROLE {
 }
 
 model User {
-  id            String    @id
+  id            String        @id
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean       @default(false)
   image         String?
-  role          USER_ROLE @default(USER) 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
+  role          USER_ROLE     @default(USER)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
   orders        Order[]
+  addresses     Address[]
+  couponUsages  CouponUsage[]
 
   @@unique([email])
   @@map("user")
@@ -83,14 +85,6 @@ model Verification {
 
 // E-commerce Models
 
-enum OrderStatus {
-  PENDING
-  PROCESSING
-  SHIPPED
-  DELIVERED
-  CANCELLED
-}
-
 model Category {
   id          String    @id @default(cuid())
   name        String
@@ -107,60 +101,147 @@ model Category {
 }
 
 model Product {
-  id              String        @id @default(cuid())
-  name            String
-  slug            String        @unique
-  description     String
-  images          String[]      @default([])
-  categoryId      String
-  category        Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  variants        Json          // Array of {weight, price, compareAtPrice, stockQuantity, inStock}
-  isFeatured      Boolean       @default(false)
-  isBestSeller    Boolean       @default(false)
-  isOnSale        Boolean       @default(false)
-  tags            String[]      @default([])
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  orderItems      OrderItem[]
+  id           String      @id @default(cuid())
+  name         String
+  slug         String      @unique
+  description  String
+  images       String[]    @default([])
+  categoryId   String
+  category     Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  variants     Json // Array of {weight, price, compareAtPrice, stockQuantity, inStock}
+  isFeatured   Boolean     @default(false)
+  isBestSeller Boolean     @default(false)
+  isOnSale     Boolean     @default(false)
+  tags         String[]    @default([])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  orderItems   OrderItem[]
 
   @@map("product")
 }
 
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
 model Order {
-  id              String      @id @default(cuid())
-  orderNumber     String      @unique
-  userId          String
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status          OrderStatus @default(PENDING)
-  subtotal        Float
-  tax             Float
-  shipping        Float
-  total           Float
+  id          String @id @default(cuid())
+  orderNumber String @unique
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status OrderStatus @default(PENDING)
+
+  couponCode String?
+
+  subtotal    Float // sum of items
+  discount    Float @default(0) // total discount applied (from coupon or other)
+  taxAmount   Float @default(0)
+  shippingFee Float @default(0)
+  total       Float // subtotal - discount + tax + shipping
+
   shippingAddress Json
   billingAddress  Json
-  paymentMethod   String
-  paymentStatus   String      @default("pending")
-  notes           String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  items           OrderItem[]
+
+  paymentStatus PaymentStatus @default(PENDING)
+
+  razorpayOrderId   String? // From Razorpay createOrder
+  razorpayPaymentId String? // From Razorpay payment callback
+  paymentMethod     String?
+  paymentCapturedAt DateTime?
+  paymentMeta       Json?
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("order")
 }
 
 model OrderItem {
-  id              String   @id @default(cuid())
-  orderId         String
-  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId       String
-  product         Product  @relation(fields: [productId], references: [id])
-  name            String
-  variantDetails  Json     // {weight, price, compareAtPrice}
-  quantity        Int
-  image           String?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id])
+  name           String
+  variantDetails Json // {weight, price}
+  quantity       Int
+  image          String?
+  createdAt      DateTime @default(now())
 
   @@map("order_item")
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  phone     String
+  email     String?
+  address   String
+  apartment String?
+  country   String  @default("India")
+  state     String
+  city      String
+  pinCode   String
+
+  @@map("address")
+}
+
+enum CouponType {
+  PERCENTAGE
+  FLAT
+}
+
+model Coupon {
+  id            String     @id @default(cuid())
+  code          String     @unique
+  type          CouponType
+  value         Float // % or flat amount
+  minOrderValue Float? // optional minimum order to apply
+  maxDiscount   Float? // optional cap for percentage coupons
+
+  isActive  Boolean   @default(true)
+  expiresAt DateTime? // null = infinite validity
+
+  globalUsageLimit Int? // null = unlimited
+  perUserLimit     Int? // null = unlimited
+
+  totalUsed    Int           @default(0)
+  usageHistory CouponUsage[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model CouponUsage {
+  id        String   @id @default(cuid())
+  couponId  String
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usedCount Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([couponId, userId])
+  @@index([couponId])
+  @@index([userId])
 }
 
 model CMSPage {

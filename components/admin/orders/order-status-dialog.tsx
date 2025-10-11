@@ -17,9 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { OrderStatus } from "@/prisma/generated/prisma";
-import { updateOrderStatus, updateOrderNotes } from "@/actions/order.actions";
+import { Separator } from "@/components/ui/separator";
+import { OrderStatus, PaymentStatus } from "@/prisma/generated/prisma";
+import { updateOrderStatus, updatePaymentStatus } from "@/actions/admin/order.actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -30,15 +30,17 @@ interface OrderStatusDialogProps {
 }
 
 export function OrderStatusDialog({ orderId, open, onOpenChange }: OrderStatusDialogProps) {
-  const [status, setStatus] = useState<OrderStatus>(OrderStatus.PENDING);
-  const [notes, setNotes] = useState("");
+  const [orderStatus, setOrderStatus] = useState<OrderStatus>(OrderStatus.PENDING);
+  const [paymentStatusValue, setPaymentStatusValue] = useState<PaymentStatus>(
+    PaymentStatus.PENDING
+  );
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (open) {
-      setStatus(OrderStatus.PENDING);
-      setNotes("");
+      setOrderStatus(OrderStatus.PENDING);
+      setPaymentStatusValue(PaymentStatus.PENDING);
     }
   }, [open]);
 
@@ -47,20 +49,27 @@ export function OrderStatusDialog({ orderId, open, onOpenChange }: OrderStatusDi
 
     setLoading(true);
     try {
-      const result = await updateOrderStatus(orderId, status);
-
-      if (result.success) {
-        if (notes.trim()) {
-          await updateOrderNotes(orderId, notes);
-        }
-        toast.success("Order status updated successfully");
-        router.refresh();
-        onOpenChange(false);
-      } else {
-        toast.error(result.error || "Failed to update order status");
+      // Update order status
+      const orderResult = await updateOrderStatus(orderId, orderStatus);
+      if (!orderResult.success) {
+        toast.error(orderResult.error || "Failed to update order status");
+        setLoading(false);
+        return;
       }
+
+      // Update payment status
+      const paymentResult = await updatePaymentStatus(orderId, paymentStatusValue);
+      if (!paymentResult.success) {
+        toast.error(paymentResult.error || "Failed to update payment status");
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Order and payment status updated successfully");
+      router.refresh();
+      onOpenChange(false);
     } catch (error) {
-      toast.error("An error occurred while updating order status");
+      toast.error("An error occurred while updating order");
     } finally {
       setLoading(false);
     }
@@ -75,9 +84,12 @@ export function OrderStatusDialog({ orderId, open, onOpenChange }: OrderStatusDi
 
         <div className="space-y-4">
           <div>
-            <Label htmlFor="status">Order Status</Label>
-            <Select value={status} onValueChange={(value) => setStatus(value as OrderStatus)}>
-              <SelectTrigger id="status">
+            <Label htmlFor="orderStatus">Order Status</Label>
+            <Select
+              value={orderStatus}
+              onValueChange={(value) => setOrderStatus(value as OrderStatus)}
+            >
+              <SelectTrigger id="orderStatus">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -90,15 +102,24 @@ export function OrderStatusDialog({ orderId, open, onOpenChange }: OrderStatusDi
             </Select>
           </div>
 
+          <Separator />
+
           <div>
-            <Label htmlFor="notes">Notes (Optional)</Label>
-            <Textarea
-              id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add any notes about this status update..."
-              rows={3}
-            />
+            <Label htmlFor="paymentStatus">Payment Status</Label>
+            <Select
+              value={paymentStatusValue}
+              onValueChange={(value) => setPaymentStatusValue(value as PaymentStatus)}
+            >
+              <SelectTrigger id="paymentStatus">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
+                <SelectItem value={PaymentStatus.SUCCESS}>Success</SelectItem>
+                <SelectItem value={PaymentStatus.FAILED}>Failed</SelectItem>
+                <SelectItem value={PaymentStatus.REFUNDED}>Refunded</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

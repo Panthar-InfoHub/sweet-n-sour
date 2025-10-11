@@ -1,25 +1,74 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { Product } from "@/lib/types";
 import { formatPrice, calculateDiscount } from "@/utils/format";
+import { useCart } from "@/hooks/use-cart";
+import { toast } from "sonner";
+import { useState } from "react";
+
+interface Variant {
+  weight: string;
+  price: number;
+  compareAtPrice: number | null;
+  stockQuantity: number;
+  inStock: boolean;
+}
 
 interface ProductCardProps {
-  product: Product;
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    images: string[];
+    variants: Variant[];
+    isBestSeller: boolean;
+    isOnSale: boolean;
+  };
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const discount = product.compareAtPrice
-    ? calculateDiscount(product.price, product.compareAtPrice)
+  const { addItem } = useCart();
+  const [selectedVariant, setSelectedVariant] = useState(0);
+
+  // Safety check for variants
+  if (!product.variants || product.variants.length === 0) {
+    return null;
+  }
+
+  const variant = product.variants[selectedVariant];
+  const discount = variant.compareAtPrice
+    ? calculateDiscount(variant.price, variant.compareAtPrice)
     : 0;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!variant.inStock) {
+      toast.error("This product is out of stock");
+      return;
+    }
+
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: variant.price,
+      image: product.images[0] || "/placeholder.svg",
+      weight: variant.weight,
+      quantity: 1,
+    });
+
+    toast.success(`${product.name} (${variant.weight}) added to cart!`);
+  };
 
   return (
     <div className="group relative bg-white rounded-lg border border-border hover:shadow-lg transition-shadow">
       {/* Sale Badge */}
       {product.isOnSale && discount > 0 && (
-        <Badge variant="sale" className="absolute top-3 left-3 z-10">
+        <Badge variant="destructive" className="absolute top-3 left-3 z-10">
           {discount}% OFF
         </Badge>
       )}
@@ -52,37 +101,44 @@ export function ProductCard({ product }: ProductCardProps) {
           </h3>
         </Link>
 
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-          <div className="flex">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`h-3 w-3 ${
-                  i < Math.floor(product.rating)
-                    ? "fill-yellow-400 text-yellow-400"
-                    : "text-gray-300"
+        {/* Variant Selector */}
+        {product.variants.length > 0 && (
+          <div className="flex gap-2 mb-2">
+            {product.variants.map((v, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedVariant(index)}
+                className={`text-xs px-2 py-1 rounded border transition-colors ${
+                  selectedVariant === index
+                    ? "border-primary bg-primary text-white"
+                    : "border-border hover:border-primary"
                 }`}
-              />
+              >
+                {v.weight}
+              </button>
             ))}
           </div>
-          <span className="text-xs text-foreground-muted">({product.reviewCount})</span>
-        </div>
+        )}
 
         {/* Price */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-primary">{formatPrice(product.price)}</span>
-          {product.compareAtPrice && (
+          <span className="text-lg font-bold text-primary">{formatPrice(variant.price)}</span>
+          {variant.compareAtPrice && (
             <span className="text-sm text-foreground-muted line-through">
-              {formatPrice(product.compareAtPrice)}
+              {formatPrice(variant.compareAtPrice)}
             </span>
           )}
         </div>
 
         {/* Add to Cart Button */}
-        <Button className="w-full bg-primary hover:bg-primary-hover" size="sm">
+        <Button
+          className="w-full bg-primary hover:bg-primary-hover"
+          size="sm"
+          onClick={handleAddToCart}
+          disabled={!variant.inStock}
+        >
           <ShoppingCart className="h-4 w-4 mr-2" />
-          Add to Cart
+          {variant.inStock ? "Add to Cart" : "Out of Stock"}
         </Button>
       </div>
     </div>

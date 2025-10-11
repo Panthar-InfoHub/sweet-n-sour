@@ -22,7 +22,7 @@ import { formatCurrency, formatDate } from "@/utils/format";
 import { OrderDetailsDialog } from "./order-details-dialog";
 import { OrderStatusDialog } from "./order-status-dialog";
 import { OrderStatus } from "@/prisma/generated/prisma";
-import { deleteOrder } from "@/actions/order.actions";
+import { deleteOrder } from "@/actions/admin/order.actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 

@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { updateVariantStock } from "@/actions/product.actions";
+import { updateVariantStock } from "@/actions/admin/product.actions";
 import { Package, Loader2 } from "lucide-react";
 
 interface ProductVariant {

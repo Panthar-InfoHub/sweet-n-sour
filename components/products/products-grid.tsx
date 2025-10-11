@@ -1,17 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { MOCK_PRODUCTS } from "@/lib/constants"
-import { ProductCard } from "@/components/products/product-card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { SlidersHorizontal } from "lucide-react"
+import { useState } from "react";
+import { ProductCard } from "@/components/products/product-card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { SlidersHorizontal } from "lucide-react";
 
-export function ProductsGrid() {
-  const [sortBy, setSortBy] = useState("featured")
+interface Variant {
+  weight: string;
+  price: number;
+  compareAtPrice: number | null;
+  stockQuantity: number;
+  inStock: boolean;
+}
 
-  // Generate more products for demo
-  const products = [...MOCK_PRODUCTS, ...MOCK_PRODUCTS, ...MOCK_PRODUCTS]
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  images: string[];
+  variants: Variant[] | any;
+  category: {
+    id: string;
+    name: string;
+  };
+  isBestSeller: boolean;
+  isOnSale: boolean;
+  tags: string[];
+}
+
+interface ProductsGridProps {
+  products: Product[];
+}
+
+export function ProductsGrid({ products }: ProductsGridProps) {
+  const [sortBy, setSortBy] = useState("featured");
 
   return (
     <div>
@@ -47,11 +77,19 @@ export function ProductsGrid() {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product, index) => (
-          <ProductCard key={`${product.id}-${index}`} product={product} />
-        ))}
-      </div>
+      {products.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            No products found. Add some products to get started.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="flex justify-center gap-2 mt-12">
@@ -72,5 +110,5 @@ export function ProductsGrid() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

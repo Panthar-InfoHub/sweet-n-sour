@@ -1,8 +1,11 @@
-
 import { ProductsGrid } from "@/components/products/products-grid";
 import { ProductFilters } from "@/components/products/product-filters";
+import { getProducts } from "@/actions/admin/product.actions";
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const result = await getProducts({});
+  const products = result.success ? result.data || [] : [];
+
   return (
     <main className="min-h-screen">
       {/* Page Header */}
@@ -23,7 +26,7 @@ export default function ProductsPage() {
 
           {/* Products Grid */}
           <div>
-            <ProductsGrid />
+            <ProductsGrid products={products} />
           </div>
         </div>
       </div>

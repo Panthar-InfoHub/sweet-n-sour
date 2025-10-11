@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDate } from "@/utils/format";
 import { Mail, Calendar, ShoppingBag, DollarSign } from "lucide-react";
-import { getUser } from "@/actions/user.actions";
+import { getUser } from "@/actions/admin/user.actions";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { USER_ROLE, OrderStatus } from "@/prisma/generated/prisma";
 

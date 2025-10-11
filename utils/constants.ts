@@ -1,6 +1,6 @@
 // Mock data for development
 
-import type { Product, Category, DashboardStats, RevenueData } from "./types"
+import type { Product, Category, DashboardStats, RevenueData } from "@/lib/types"
 
 export const MOCK_CATEGORIES: Category[] = [
   {

@@ -8,8 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MediaSection } from "./media-section";
-import { createCategory, updateCategory } from "@/actions/category.actions";
+import { MediaSection } from "@/components/admin/shared/media-section";
+import { createCategory, updateCategory } from "@/actions/admin/category.actions";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -209,7 +209,9 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
                   placeholder="0"
                   disabled={isLoading}
                 />
-                <p className="text-xs text-muted-foreground">Lower numbers show first. Use this to prioritize categories.</p>
+                <p className="text-xs text-muted-foreground">
+                  Lower numbers show first. Use this to prioritize categories.
+                </p>
               </div>
 
               <div className="flex items-center justify-between">

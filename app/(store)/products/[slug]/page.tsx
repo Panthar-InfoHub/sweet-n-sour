@@ -1,22 +1,22 @@
-import { AnnouncementBar } from "@/components/layout/announcement-bar";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { ProductDetail } from "@/components/products/product-detail";
 import { RelatedProducts } from "@/components/products/related-products";
-import { MOCK_PRODUCTS } from "@/lib/constants";
+import { getProductBySlug } from "@/actions/admin/product.actions";
 import { notFound } from "next/navigation";
 
-export default function ProductDetailPage({ params }: { params: { slug: string } }) {
-  const product = MOCK_PRODUCTS.find((p) => p.slug === params.slug);
+export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const result = await getProductBySlug(slug);
 
-  if (!product) {
+  if (!result.success || !result.data) {
     notFound();
   }
+
+  const product = result.data;
 
   return (
     <main className="min-h-screen py-8">
       <ProductDetail product={product} />
-      <RelatedProducts currentProductId={product.id} />
+      <RelatedProducts currentProductId={product.id} categoryId={product.categoryId} />
     </main>
   );
 }

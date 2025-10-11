@@ -1,5 +1,5 @@
 import { CategoryForm } from "@/components/admin/category/category-form";
-import { getCategoryBySlug } from "@/actions/category.actions";
+import { getCategoryBySlug } from "@/actions/admin/category.actions";
 import { notFound } from "next/navigation";
 
 export default async function EditCategoryPage({ params }: { params: Promise<{ slug: string }> }) {

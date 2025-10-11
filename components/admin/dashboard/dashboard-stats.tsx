@@ -1,5 +1,5 @@
 import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users, Package } from "lucide-react";
-import { MOCK_DASHBOARD_STATS } from "@/lib/constants";
+import { MOCK_DASHBOARD_STATS } from "@/utils/constants";
 import { formatPrice } from "@/utils/format";
 import { Card, CardContent } from "@/components/ui/card";
 

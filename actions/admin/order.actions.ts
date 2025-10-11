@@ -2,7 +2,7 @@
 
 import { prisma } from "@/prisma/db";
 import { revalidatePath } from "next/cache";
-import { OrderStatus } from "@/prisma/generated/prisma";
+import { OrderStatus, PaymentStatus } from "@/prisma/generated/prisma";
 
 // Get all orders with filtering
 export async function getOrders(filters?: {
@@ -139,6 +139,34 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
   }
 }
 
+// Update payment status
+export async function updatePaymentStatus(id: string, paymentStatus: PaymentStatus) {
+  try {
+    const order = await prisma.order.update({
+      where: { id },
+      data: {
+        paymentStatus,
+        paymentCapturedAt: paymentStatus === "SUCCESS" ? new Date() : undefined,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    revalidatePath("/admin/orders");
+    return { success: true, data: order, message: "Payment status updated successfully" };
+  } catch (error) {
+    console.error("Error updating payment status:", error);
+    return { success: false, error: "Failed to update payment status" };
+  }
+}
+
 // Delete order (admin only - use with caution)
 export async function deleteOrder(id: string) {
   try {
@@ -220,21 +248,5 @@ export async function getRecentOrders(limit: number = 10) {
   } catch (error) {
     console.error("Error fetching recent orders:", error);
     return { success: false, error: "Failed to fetch recent orders" };
-  }
-}
-
-// Update order notes
-export async function updateOrderNotes(id: string, notes: string) {
-  try {
-    const order = await prisma.order.update({
-      where: { id },
-      data: { notes },
-    });
-
-    revalidatePath("/admin/orders");
-    return { success: true, data: order };
-  } catch (error) {
-    console.error("Error updating order notes:", error);
-    return { success: false, error: "Failed to update order notes" };
   }
 }

@@ -1,7 +1,15 @@
-"use client"
+"use client";
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import { MOCK_REVENUE_DATA } from "@/lib/constants"
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { MOCK_REVENUE_DATA } from "@/utils/constants";
 
 export function RevenueChart() {
   return (
@@ -19,9 +27,15 @@ export function RevenueChart() {
               borderRadius: "8px",
             }}
           />
-          <Line type="monotone" dataKey="revenue" stroke="#4a7c59" strokeWidth={2} dot={{ fill: "#4a7c59" }} />
+          <Line
+            type="monotone"
+            dataKey="revenue"
+            stroke="#4a7c59"
+            strokeWidth={2}
+            dot={{ fill: "#4a7c59" }}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }

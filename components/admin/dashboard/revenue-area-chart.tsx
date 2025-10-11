@@ -1,16 +1,26 @@
-"use client"
+"use client";
 
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import { MOCK_REVENUE_DATA } from "@/lib/constants"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp } from "lucide-react"
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { MOCK_REVENUE_DATA } from "@/utils/constants";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { TrendingUp } from "lucide-react";
 
 export function RevenueAreaChart() {
   // Calculate total and growth
-  const total = MOCK_REVENUE_DATA.reduce((sum, item) => sum + item.revenue, 0)
-  const lastMonth = MOCK_REVENUE_DATA[MOCK_REVENUE_DATA.length - 1]?.revenue || 0
-  const previousMonth = MOCK_REVENUE_DATA[MOCK_REVENUE_DATA.length - 2]?.revenue || 0
-  const growth = previousMonth ? (((lastMonth - previousMonth) / previousMonth) * 100).toFixed(1) : 0
+  const total = MOCK_REVENUE_DATA.reduce((sum, item) => sum + item.revenue, 0);
+  const lastMonth = MOCK_REVENUE_DATA[MOCK_REVENUE_DATA.length - 1]?.revenue || 0;
+  const previousMonth = MOCK_REVENUE_DATA[MOCK_REVENUE_DATA.length - 2]?.revenue || 0;
+  const growth = previousMonth
+    ? (((lastMonth - previousMonth) / previousMonth) * 100).toFixed(1)
+    : 0;
 
   return (
     <Card>
@@ -38,7 +48,11 @@ export function RevenueAreaChart() {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis dataKey="month" className="text-xs" tick={{ fill: "hsl(var(--muted-foreground))" }} />
+            <XAxis
+              dataKey="month"
+              className="text-xs"
+              tick={{ fill: "hsl(var(--muted-foreground))" }}
+            />
             <YAxis className="text-xs" tick={{ fill: "hsl(var(--muted-foreground))" }} />
             <Tooltip
               contentStyle={{
@@ -60,5 +74,5 @@ export function RevenueAreaChart() {
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

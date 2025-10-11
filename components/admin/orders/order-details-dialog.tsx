@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDate } from "@/utils/format";
 import { Package, MapPin, CreditCard, User } from "lucide-react";
-import { getOrder } from "@/actions/order.actions";
+import { getOrder } from "@/actions/admin/order.actions";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { OrderStatus } from "@/prisma/generated/prisma";
 import Image from "next/image";
@@ -23,14 +23,18 @@ interface OrderDetails {
   createdAt: Date;
   status: OrderStatus;
   subtotal: number;
-  tax: number;
-  shipping: number;
+  discount: number;
+  taxAmount: number;
+  shippingFee: number;
   total: number;
+  couponCode: string | null;
   shippingAddress: any;
   billingAddress: any;
-  paymentMethod: string;
+  paymentMethod: string | null;
   paymentStatus: string;
-  notes: string | null;
+  razorpayOrderId: string | null;
+  razorpayPaymentId: string | null;
+  paymentCapturedAt: Date | null;
   user: {
     id: string;
     name: string;
@@ -165,18 +169,26 @@ export function OrderDetailsDialog({ orderId, open, onOpenChange }: OrderDetails
                 <h3 className="font-semibold">Shipping Address</h3>
               </div>
               <div className="p-3 rounded-lg bg-muted/50">
-                <p className="font-medium">{order.shippingAddress.fullName}</p>
+                <p className="font-medium">
+                  {order.shippingAddress.firstName} {order.shippingAddress.lastName}
+                </p>
                 <p className="text-sm text-muted-foreground mt-1">
                   {order.shippingAddress.address}
+                  {order.shippingAddress.apartment && `, ${order.shippingAddress.apartment}`}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-                  {order.shippingAddress.postalCode}
+                  {order.shippingAddress.pinCode}
                 </p>
                 <p className="text-sm text-muted-foreground">{order.shippingAddress.country}</p>
                 {order.shippingAddress.phone && (
                   <p className="text-sm text-muted-foreground mt-1">
                     Phone: {order.shippingAddress.phone}
+                  </p>
+                )}
+                {order.shippingAddress.email && (
+                  <p className="text-sm text-muted-foreground">
+                    Email: {order.shippingAddress.email}
                   </p>
                 )}
               </div>
@@ -189,26 +201,35 @@ export function OrderDetailsDialog({ orderId, open, onOpenChange }: OrderDetails
                 <CreditCard className="h-4 w-4" />
                 <h3 className="font-semibold">Payment Information</h3>
               </div>
-              <div className="p-3 rounded-lg bg-muted/50">
-                <p className="text-sm text-muted-foreground">Payment Method</p>
-                <p className="font-medium capitalize">{order.paymentMethod}</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Status: <span className="capitalize font-medium">{order.paymentStatus}</span>
-                </p>
+              <div className="p-3 rounded-lg bg-muted/50 space-y-2">
+                <div>
+                  <p className="text-sm text-muted-foreground">Payment Method</p>
+                  <p className="font-medium capitalize">{order.paymentMethod || "Not specified"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Payment Status</p>
+                  <p className="capitalize font-medium">{order.paymentStatus.toLowerCase()}</p>
+                </div>
+                {order.razorpayOrderId && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Razorpay Order ID</p>
+                    <p className="font-mono text-xs">{order.razorpayOrderId}</p>
+                  </div>
+                )}
+                {order.razorpayPaymentId && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Razorpay Payment ID</p>
+                    <p className="font-mono text-xs">{order.razorpayPaymentId}</p>
+                  </div>
+                )}
+                {order.paymentCapturedAt && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Payment Captured At</p>
+                    <p className="text-sm">{formatDate(order.paymentCapturedAt)}</p>
+                  </div>
+                )}
               </div>
             </div>
-
-            {order.notes && (
-              <>
-                <Separator />
-                <div>
-                  <h3 className="font-semibold mb-2">Order Notes</h3>
-                  <div className="p-3 rounded-lg bg-muted/50">
-                    <p className="text-sm">{order.notes}</p>
-                  </div>
-                </div>
-              </>
-            )}
 
             <Separator />
 
@@ -217,13 +238,21 @@ export function OrderDetailsDialog({ orderId, open, onOpenChange }: OrderDetails
                 <span className="text-muted-foreground">Subtotal</span>
                 <span>{formatCurrency(order.subtotal)}</span>
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Tax</span>
-                <span>{formatCurrency(order.tax)}</span>
-              </div>
+              {order.discount > 0 && (
+                <div className="flex items-center justify-between text-sm text-green-600">
+                  <span>Discount {order.couponCode && `(${order.couponCode})`}</span>
+                  <span>-{formatCurrency(order.discount)}</span>
+                </div>
+              )}
+              {order.taxAmount > 0 && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Tax</span>
+                  <span>{formatCurrency(order.taxAmount)}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
-                <span>{formatCurrency(order.shipping)}</span>
+                <span>{order.shippingFee === 0 ? "FREE" : formatCurrency(order.shippingFee)}</span>
               </div>
               <Separator />
               <div className="flex items-center justify-between font-semibold text-lg">

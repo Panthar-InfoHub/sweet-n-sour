@@ -1,15 +1,12 @@
-"use client";
-import { MediaSection } from "@/components/admin/shared/media-section";
-import React, { useState } from "react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import React from "react";
 
-const page = () => {
-  const [media, setMedia] = useState<string[]>([]);
-
-  return (
-    <div>
-      <MediaSection media={media} onChange={setMedia} maxFiles={8} />
-    </div>
-  );
+const page = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  return <pre>{JSON.stringify(session, null, 2)}</pre>;
 };
 
 export default page;

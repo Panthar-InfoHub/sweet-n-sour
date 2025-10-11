@@ -42,7 +42,6 @@ export async function getUsers(filters?: { role?: USER_ROLE; search?: string }) 
       orderBy: { createdAt: "desc" },
     });
 
-
     // Calculate total spent for each user
     const usersWithStats = users.map((user) => ({
       id: user.id,

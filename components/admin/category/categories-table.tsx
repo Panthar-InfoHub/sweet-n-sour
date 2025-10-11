@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { DeleteConfirmDialog } from "./delete-confirm-dialog";
-import { getCategories, deleteCategory } from "@/actions/category.actions";
+import { DeleteConfirmDialog } from "@/components/admin/shared/delete-confirm-dialog";
+import { getCategories, deleteCategory } from "@/actions/admin/category.actions";
 import { toast } from "sonner";
 
 interface Category {

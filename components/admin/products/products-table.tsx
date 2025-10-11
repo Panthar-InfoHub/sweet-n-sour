@@ -30,7 +30,7 @@ import {
   toggleProductFeatured,
   toggleProductBestSeller,
   toggleProductSale,
-} from "@/actions/product.actions";
+} from "@/actions/admin/product.actions";
 import { toast } from "sonner";
 import { formatCurrency } from "@/utils/format";
 

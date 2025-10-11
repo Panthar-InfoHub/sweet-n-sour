@@ -33,10 +33,12 @@ const mockOrders: Order[] = [
       },
     ],
     subtotal: 898,
-    tax: 72,
-    shipping: 0,
+    taxAmount: 72,
+    shippingFee: 0,
+    discount: 0,
     total: 970,
     status: "delivered",
+    paymentStatus: "success",
     shippingAddress: {
       id: "1",
       userId: "1",
@@ -67,12 +69,12 @@ const mockOrders: Order[] = [
   },
 ];
 
-const statusColors: Record<OrderStatus, "default" | "success" | "warning" | "error"> = {
-  pending: "warning",
-  processing: "default",
-  shipped: "default",
-  delivered: "success",
-  cancelled: "error",
+const statusColors: Record<OrderStatus, "default" | "secondary" | "destructive" | "outline"> = {
+  pending: "outline",
+  processing: "secondary",
+  shipped: "secondary",
+  delivered: "default",
+  cancelled: "destructive",
 };
 
 export function OrdersList() {
@@ -208,16 +210,18 @@ export function OrdersList() {
                                 <span className="text-foreground-muted">Subtotal</span>
                                 <span>{formatPrice(selectedOrder.subtotal)}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-foreground-muted">Tax</span>
-                                <span>{formatPrice(selectedOrder.tax)}</span>
-                              </div>
+                              {selectedOrder.discount > 0 && (
+                                <div className="flex justify-between text-green-600">
+                                  <span>Discount</span>
+                                  <span>-{formatPrice(selectedOrder.discount)}</span>
+                                </div>
+                              )}
                               <div className="flex justify-between">
                                 <span className="text-foreground-muted">Shipping</span>
                                 <span>
-                                  {selectedOrder.shipping === 0
+                                  {selectedOrder.shippingFee === 0
                                     ? "FREE"
-                                    : formatPrice(selectedOrder.shipping)}
+                                    : formatPrice(selectedOrder.shippingFee)}
                                 </span>
                               </div>
                               <div className="flex justify-between pt-2 border-t border-border font-semibold text-base">
