@@ -5,7 +5,6 @@ import { getProducts } from "@/actions/admin/product.actions";
 
 export async function BestSellersSection() {
   const result = await getProducts({ isBestSeller: true });
-  console.log(result)
   const products = result.success && result.data ? result.data.slice(0, 4) : [];
 
   return (

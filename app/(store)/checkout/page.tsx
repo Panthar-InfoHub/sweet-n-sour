@@ -21,6 +21,7 @@ import { validateCoupon } from "@/actions/admin/coupon.actions";
 import { initiateOrder } from "@/actions/payment/initiate-order";
 import { confirmOrder } from "@/actions/payment/confirm-order";
 import { DeletePendingOrder } from "@/actions/payment/delete-pending-order";
+import { FailedOrder } from "@/actions/payment/failed-order";
 
 declare global {
   interface Window {
@@ -201,17 +202,18 @@ export default function CheckoutPage() {
 
       const { orderId, razorpayOrderId, key, amount } = res.data;
 
-      toast.loading("Opening payment gateway...", { id: "payment" });
+      // Track if payment was attempted (prevents deletion on dismiss after failed payment)
+      let paymentAttempted = false;
 
       const options = {
         key,
         amount: amount * 100,
         order_id: razorpayOrderId,
+        retry: false,
         handler: async (response: any) => {
           try {
+            paymentAttempted = true;
             setPaymentStatus("verifying");
-            toast.loading("Verifying payment...", { id: "payment" });
-
             const result = await confirmOrder({
               orderId,
               razorpay_order_id: response.razorpay_order_id,
@@ -221,7 +223,7 @@ export default function CheckoutPage() {
 
             if (result.success) {
               setPaymentStatus("success");
-              toast.success("Payment successful! Redirecting...", { id: "payment" });
+              toast.success("Payment successful!", { id: "payment" });
               clearCart();
               router.push("/account/orders");
             } else {
@@ -237,9 +239,35 @@ export default function CheckoutPage() {
           }
         },
         modal: {
-          ondismiss: async() => {
-            await DeletePendingOrder(orderId);
-            toast.error("Payment cancelled", { id: "payment" });
+          ondismiss: async () => {
+            // IMPORTANT: Only delete order if payment was NOT attempted
+            // This prevents deletion when:
+            // 1. Payment fails (paymentAttempted will be true)
+            // 2. Payment succeeds but user closes confirmation
+            // 3. Any payment attempt was made
+
+            if (!paymentAttempted) {
+              // User closed modal WITHOUT attempting payment
+              // Safe to delete the pending order
+              console.log("User cancelled payment before attempting - deleting order");
+              const result = await DeletePendingOrder(orderId);
+
+              if (result.success) {
+                toast.error("Payment cancelled", { id: "payment" });
+              } else {
+                // This shouldn't happen, but handle gracefully
+
+                toast.error("Payment cancelled", { id: "payment" });
+              }
+            } else {
+              // Payment was attempted - DO NOT delete order
+              // Order status is already updated by payment.failed or handler
+              console.log("Payment was attempted - keeping order for records");
+              toast.error("Payment window closed. Check your orders for status.", {
+                id: "payment",
+              });
+            }
+
             setPaymentStatus("idle");
             setIsProcessing(false);
           },
@@ -247,6 +275,16 @@ export default function CheckoutPage() {
       };
 
       const rzp = new window.Razorpay(options);
+
+      // Handle payment failure - mark order as FAILED, don't delete
+      rzp.on("payment.failed", async function (response: any) {
+        paymentAttempted = true; // Mark that payment was attempted
+        console.log("Payment failed, marking order as FAILED");
+        await FailedOrder(orderId);
+        toast.error("Payment failed.", { id: "payment" });
+        setPaymentStatus("idle");
+        setIsProcessing(false);
+      });
       rzp.open();
     } catch (error: any) {
       console.error("Error processing order:", error);
