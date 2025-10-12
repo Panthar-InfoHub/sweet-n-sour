@@ -65,7 +65,12 @@ export const addressSchema = z.object({
 
 export const orderItemSchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
-  variantWeight: z.string().min(1, "Variant weight is required"),
+  name: z.string().min(1, "Product name is required"),
+  image: z.string().optional(),
+  variantDetails: z.object({
+    weight: z.string().min(1, "Variant weight is required"),
+    price: z.number().positive("Price must be positive"),
+  }),
   quantity: z.number().int().positive("Quantity must be positive"),
 });
 

@@ -32,6 +32,7 @@ interface Order {
   createdAt: Date;
   total: number;
   status: OrderStatus;
+  paymentStatus: string;
   user: {
     id: string;
     name: string;
@@ -60,6 +61,23 @@ const getStatusColor = (status: OrderStatus) => {
       return "bg-green-500/10 text-green-700 dark:text-green-400";
     case "CANCELLED":
       return "bg-red-500/10 text-red-700 dark:text-red-400";
+    case "FAILED":
+      return "bg-red-500/10 text-red-700 dark:text-red-400";
+    default:
+      return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+  }
+};
+
+const getPaymentStatusColor = (status: string) => {
+  switch (status) {
+    case "PENDING":
+      return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400";
+    case "SUCCESS":
+      return "bg-green-500/10 text-green-700 dark:text-green-400";
+    case "FAILED":
+      return "bg-red-500/10 text-red-700 dark:text-red-400";
+    case "REFUNDED":
+      return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
     default:
       return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
   }
@@ -108,14 +126,15 @@ export function OrdersTable({ orders }: OrdersTableProps) {
               <TableHead>Date</TableHead>
               <TableHead>Items</TableHead>
               <TableHead>Total</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Order Status</TableHead>
+              <TableHead>Payment Status</TableHead>
               <TableHead className="w-[80px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                   No orders found
                 </TableCell>
               </TableRow>
@@ -135,6 +154,11 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                   <TableCell>
                     <Badge variant="secondary" className={getStatusColor(order.status)}>
                       {order.status.toLowerCase()}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className={getPaymentStatusColor(order.paymentStatus)}>
+                      {order.paymentStatus.toLowerCase()}
                     </Badge>
                   </TableCell>
                   <TableCell>

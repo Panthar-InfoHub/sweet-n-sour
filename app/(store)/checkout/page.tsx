@@ -15,23 +15,28 @@ import Image from "next/image";
 import { PhoneInput } from "@/components/ui/phone-input";
 import Script from "next/script";
 import { useSession } from "@/lib/auth-client";
-import createOrder from "@/actions/payment/create-order";
 import { checkoutFormSchema, type CheckoutFormData } from "@/lib/zod-schema";
 import { z } from "zod";
 import { validateCoupon } from "@/actions/admin/coupon.actions";
+import { initiateOrder } from "@/actions/payment/initiate-order";
+import { confirmOrder } from "@/actions/payment/confirm-order";
 
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { data: session } = useSession();
-
-  // if (!session) {
-  //   router.push("/login?redirect=/checkout");
-  // }
+  const { data: session, isPending } = useSession();
 
   const { items, getSubtotal, getShipping, getTotal, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCouponApplying, setIsCouponApplying] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<
+    "idle" | "initiating" | "verifying" | "success"
+  >("idle");
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(
     null
   );
@@ -51,6 +56,10 @@ export default function CheckoutPage() {
     pinCode: "",
     coupon: "",
   });
+
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
 
   // Redirect if cart is empty
   if (items.length === 0) {
@@ -142,6 +151,8 @@ export default function CheckoutPage() {
     }
 
     setIsProcessing(true);
+    setPaymentStatus("initiating");
+
     try {
       const addressDetails = {
         country: formData.country,
@@ -156,9 +167,20 @@ export default function CheckoutPage() {
         email: formData.email || undefined,
       };
 
+      // Calculate totals
+      const subtotal = getSubtotal();
+      const shippingFee = getShipping();
+      const discount = appliedCoupon?.discount || 0;
+      const total = subtotal + shippingFee - discount;
+
       const orderItems = items.map((item) => ({
         productId: item.productId,
-        variantWeight: item.weight,
+        name: item.name,
+        image: item.image,
+        variantDetails: {
+          weight: item.weight,
+          price: item.price,
+        },
         quantity: item.quantity,
       }));
 
@@ -169,20 +191,67 @@ export default function CheckoutPage() {
         billingAddress: addressDetails,
       };
 
-      // Create order
-      const result = await createOrder(orderData);
+      // Initiate order - this creates the order in DB with PENDING status
+      const res = await initiateOrder(orderData);
 
-      if (result.success) {
-        toast.success("Order placed successfully!");
-        clearCart();
-        router.push(`/account/orders`);
-      } else {
-        toast.error(result.error || "Failed to create order");
+      if (!res.success || !res.data) {
+        throw new Error("Failed to initiate payment");
       }
-    } catch (error) {
+
+      const { orderId, razorpayOrderId, key, amount } = res.data;
+
+      toast.loading("Opening payment gateway...", { id: "payment" });
+
+      const options = {
+        key,
+        amount: amount * 100,
+        order_id: razorpayOrderId,
+        handler: async (response: any) => {
+          try {
+            setPaymentStatus("verifying");
+            toast.loading("Verifying payment...", { id: "payment" });
+
+            const result = await confirmOrder({
+              orderId,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            if (result.success) {
+              setPaymentStatus("success");
+              toast.success("Payment successful! Redirecting...", { id: "payment" });
+              clearCart();
+              router.push("/account/orders");
+            } else {
+              throw new Error("Payment verification failed");
+            }
+          } catch (error: any) {
+            console.error("Error confirming order:", error);
+            toast.error(error.message || "Payment verification failed. Please contact support.", {
+              id: "payment",
+            });
+            setPaymentStatus("idle");
+            setIsProcessing(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            toast.error("Payment cancelled", { id: "payment" });
+            setPaymentStatus("idle");
+            setIsProcessing(false);
+          },
+          
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
+    } catch (error: any) {
       console.error("Error processing order:", error);
-      toast.error("Failed to process order. Please try again.");
-    } finally {
+      toast.error(error.message || "Failed to process order. Please try again.", { id: "payment" });
+      setPaymentStatus("idle");
       setIsProcessing(false);
     }
   };
@@ -451,14 +520,25 @@ export default function CheckoutPage() {
                   className="w-full bg-primary hover:bg-primary/90 h-12 text-base font-semibold"
                   size="lg"
                 >
-                  {isProcessing ? (
+                  {paymentStatus === "initiating" && (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
+                      Initiating Payment...
                     </>
-                  ) : (
-                    "Pay Now"
                   )}
+                  {paymentStatus === "verifying" && (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Verifying Payment...
+                    </>
+                  )}
+                  {paymentStatus === "success" && (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Success! Redirecting...
+                    </>
+                  )}
+                  {paymentStatus === "idle" && "Pay Now"}
                 </Button>
               </Card>
             </div>
