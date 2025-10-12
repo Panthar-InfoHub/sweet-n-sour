@@ -164,11 +164,6 @@ model Order {
   paymentCapturedAt DateTime?
   paymentMeta       Json?
 
-  // Webhook tracking
-  webhookReceived    Boolean  @default(false)
-  webhookReceivedAt  DateTime?
-  webhookEvent       String? // e.g., payment.captured, payment.failed
-  paymentFailureReason String?
 
   items OrderItem[]
 

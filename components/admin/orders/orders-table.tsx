@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Truck, X } from "lucide-react";
+import { MoreHorizontal, Eye, Truck, X, Trash2 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/utils/format";
 import { OrderDetailsDialog } from "./order-details-dialog";
 import { OrderStatusDialog } from "./order-status-dialog";
@@ -25,6 +25,7 @@ import { OrderStatus } from "@/prisma/generated/prisma";
 import { deleteOrder } from "@/actions/admin/order.actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { DeleteConfirmDialog } from "@/components/admin/shared/delete-confirm-dialog";
 
 interface Order {
   id: string;
@@ -87,6 +88,8 @@ export function OrdersTable({ orders }: OrdersTableProps) {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
   const router = useRouter();
 
   const handleViewDetails = (orderId: string) => {
@@ -99,16 +102,23 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     setIsStatusOpen(true);
   };
 
-  const handleCancelOrder = async (orderId: string) => {
-    if (confirm("Are you sure you want to cancel this order?")) {
-      const result = await deleteOrder(orderId);
-      if (result.success) {
-        toast.success("Order cancelled successfully");
-        router.refresh();
-      } else {
-        toast.error(result.error || "Failed to cancel order");
-      }
+  const handleDeleteClick = (orderId: string) => {
+    setOrderToDelete(orderId);
+    setIsDeleteOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!orderToDelete) return;
+
+    const result = await deleteOrder(orderToDelete);
+    if (result.success) {
+      toast.success("Order cancelled successfully");
+      router.refresh();
+    } else {
+      toast.error(result.error || "Failed to cancel order");
     }
+    setIsDeleteOpen(false);
+    setOrderToDelete(null);
   };
 
   const totalItems = (items: Array<{ quantity: number }>) => {
@@ -157,7 +167,10 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className={getPaymentStatusColor(order.paymentStatus)}>
+                    <Badge
+                      variant="secondary"
+                      className={getPaymentStatusColor(order.paymentStatus)}
+                    >
                       {order.paymentStatus.toLowerCase()}
                     </Badge>
                   </TableCell>
@@ -179,10 +192,10 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => handleCancelOrder(order.id)}
+                          onClick={() => handleDeleteClick(order.id)}
                         >
-                          <X className="h-4 w-4 mr-2" />
-                          Cancel Order
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Order
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -204,6 +217,14 @@ export function OrdersTable({ orders }: OrdersTableProps) {
         orderId={selectedOrderId}
         open={isStatusOpen}
         onOpenChange={setIsStatusOpen}
+      />
+
+      <DeleteConfirmDialog
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Order"
+        description="Are you sure you want to delete this order? This action cannot be undone."
       />
     </>
   );

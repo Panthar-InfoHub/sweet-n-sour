@@ -22,6 +22,7 @@ import { formatDate, formatPrice } from "@/utils/format";
 import { deleteCoupon, toggleCouponStatus } from "@/actions/admin/coupon.actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { DeleteConfirmDialog } from "@/components/admin/shared/delete-confirm-dialog";
 
 interface Coupon {
   id: string;
@@ -44,6 +45,8 @@ interface CouponsTableProps {
 export function CouponsTable({ coupons }: CouponsTableProps) {
   const router = useRouter();
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [couponToDelete, setCouponToDelete] = useState<{ id: string; code: string } | null>(null);
 
   const handleToggleStatus = async (id: string) => {
     setLoadingId(id);
@@ -62,22 +65,29 @@ export function CouponsTable({ coupons }: CouponsTableProps) {
     }
   };
 
-  const handleDelete = async (id: string, code: string) => {
-    if (confirm(`Are you sure you want to delete coupon "${code}"?`)) {
-      setLoadingId(id);
-      try {
-        const result = await deleteCoupon(id);
-        if (result.success) {
-          toast.success(result.message);
-          router.refresh();
-        } else {
-          toast.error(result.error);
-        }
-      } catch (error) {
-        toast.error("Failed to delete coupon");
-      } finally {
-        setLoadingId(null);
+  const handleDeleteClick = (id: string, code: string) => {
+    setCouponToDelete({ id, code });
+    setIsDeleteOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!couponToDelete) return;
+
+    setLoadingId(couponToDelete.id);
+    try {
+      const result = await deleteCoupon(couponToDelete.id);
+      if (result.success) {
+        toast.success(result.message);
+        router.refresh();
+      } else {
+        toast.error(result.error);
       }
+    } catch (error) {
+      toast.error("Failed to delete coupon");
+    } finally {
+      setLoadingId(null);
+      setIsDeleteOpen(false);
+      setCouponToDelete(null);
     }
   };
 
@@ -173,7 +183,7 @@ export function CouponsTable({ coupons }: CouponsTableProps) {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-destructive"
-                        onClick={() => handleDelete(coupon.id, coupon.code)}
+                        onClick={() => handleDeleteClick(coupon.id, coupon.code)}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete
@@ -186,6 +196,18 @@ export function CouponsTable({ coupons }: CouponsTableProps) {
           )}
         </TableBody>
       </Table>
+
+      <DeleteConfirmDialog
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Coupon"
+        description={
+          couponToDelete
+            ? `Are you sure you want to delete coupon "${couponToDelete.code}"? This action cannot be undone.`
+            : "Are you sure you want to delete this coupon?"
+        }
+      />
     </div>
   );
 }

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/prisma/db";
-import { verifyWebhookSignature, deductStockForOrder, updateCouponUsage } from "@/utils/order-helpers";
+import {
+  verifyWebhookSignature,
+  deductStockForOrder,
+  updateCouponUsage,
+} from "@/utils/order-helpers";
 
 /**
  * Razorpay Webhook Handler
@@ -16,10 +20,7 @@ export async function POST(req: NextRequest) {
     const signature = req.headers.get("x-razorpay-signature");
 
     if (!signature) {
-      return NextResponse.json(
-        { error: "Missing webhook signature" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing webhook signature" }, { status: 400 });
     }
 
     // Verify webhook signature
@@ -28,10 +29,7 @@ export async function POST(req: NextRequest) {
 
     if (!isValid) {
       console.error("Invalid webhook signature");
-      return NextResponse.json(
-        { error: "Invalid webhook signature" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid webhook signature" }, { status: 401 });
     }
 
     // Parse the payload
@@ -60,10 +58,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("Webhook processing error:", error);
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
   }
 }
 
@@ -106,10 +101,9 @@ async function handlePaymentSuccess(paymentEntity: any, orderEntity: any) {
           paymentStatus: "SUCCESS",
           razorpayPaymentId: razorpayPaymentId || order.razorpayPaymentId,
           paymentCapturedAt: new Date(),
-          paymentMethod: "RAZORPAY",
-          webhookReceived: true,
-          webhookReceivedAt: new Date(),
-          webhookEvent: "payment.captured",
+          paymentMethod: paymentEntity?.method || "RAZORPAY",
+          paymentMeta: paymentEntity || {},
+          
         },
       });
 
@@ -140,8 +134,6 @@ async function handlePaymentSuccess(paymentEntity: any, orderEntity: any) {
 
 async function handlePaymentFailure(paymentEntity: any, orderEntity: any) {
   const razorpayOrderId = paymentEntity?.order_id || orderEntity?.id;
-  const errorDescription = paymentEntity?.error_description || "Payment failed";
-
   if (!razorpayOrderId) {
     console.error("Missing order ID in webhook payload");
     return;
@@ -172,10 +164,7 @@ async function handlePaymentFailure(paymentEntity: any, orderEntity: any) {
       data: {
         status: "FAILED",
         paymentStatus: "FAILED",
-        paymentFailureReason: errorDescription,
-        webhookReceived: true,
-        webhookReceivedAt: new Date(),
-        webhookEvent: "payment.failed",
+        paymentMeta: paymentEntity || {}
       },
     });
 

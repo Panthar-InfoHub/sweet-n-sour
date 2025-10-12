@@ -20,6 +20,7 @@ import { z } from "zod";
 import { validateCoupon } from "@/actions/admin/coupon.actions";
 import { initiateOrder } from "@/actions/payment/initiate-order";
 import { confirmOrder } from "@/actions/payment/confirm-order";
+import { DeletePendingOrder } from "@/actions/payment/delete-pending-order";
 
 declare global {
   interface Window {
@@ -236,18 +237,17 @@ export default function CheckoutPage() {
           }
         },
         modal: {
-          ondismiss: () => {
+          ondismiss: async() => {
+            await DeletePendingOrder(orderId);
             toast.error("Payment cancelled", { id: "payment" });
             setPaymentStatus("idle");
             setIsProcessing(false);
           },
-          
         },
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
-
     } catch (error: any) {
       console.error("Error processing order:", error);
       toast.error(error.message || "Failed to process order. Please try again.", { id: "payment" });

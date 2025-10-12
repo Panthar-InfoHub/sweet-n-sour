@@ -51,10 +51,7 @@ export function verifyWebhookSignature(
   signature: string,
   secret: string
 ): boolean {
-  const expectedSignature = crypto
-    .createHmac("sha256", secret)
-    .update(payload)
-    .digest("hex");
+  const expectedSignature = crypto.createHmac("sha256", secret).update(payload).digest("hex");
 
   return expectedSignature === signature;
 }

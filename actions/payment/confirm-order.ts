@@ -34,7 +34,7 @@ export async function confirmOrder({
         data: {
           status: "FAILED",
           paymentStatus: "FAILED",
-          paymentFailureReason: "Payment signature verification failed",
+          paymentMeta: { error: "Invalid payment signature" },
         },
       });
       throw new Error("Payment verification failed");
@@ -69,6 +69,7 @@ export async function confirmOrder({
           paymentStatus: "SUCCESS",
           razorpayPaymentId: razorpay_payment_id,
           paymentCapturedAt: new Date(),
+          
           paymentMethod: "RAZORPAY",
         },
         include: {
@@ -109,7 +110,7 @@ export async function confirmOrder({
         data: {
           status: "FAILED",
           paymentStatus: "FAILED",
-          paymentFailureReason: error.message || "Unknown error during confirmation",
+          paymentMeta: { error: error.message || "Unknown error" },
         },
       });
     } catch (updateError) {
