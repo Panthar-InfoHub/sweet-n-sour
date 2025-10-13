@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/use-cart-db";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { formatPrice } from "@/utils/format";
-import { ShoppingBag, Loader2, CheckCircle2 } from "lucide-react";
+import { ShoppingBag, Loader2, CheckCircle2, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
@@ -22,6 +22,8 @@ import { initiateOrder } from "@/actions/payment/initiate-order";
 import { confirmOrder } from "@/actions/payment/confirm-order";
 import { DeletePendingOrder } from "@/actions/payment/delete-pending-order";
 import { FailedOrder } from "@/actions/payment/failed-order";
+import { getAddresses } from "@/actions/store/address.actions";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 declare global {
   interface Window {
@@ -44,6 +46,11 @@ export default function CheckoutPage() {
   );
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
 
+  // Saved addresses state
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("new");
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
+
   // Form state
   const [formData, setFormData] = useState<CheckoutFormData>({
     firstName: "",
@@ -58,6 +65,84 @@ export default function CheckoutPage() {
     pinCode: "",
     coupon: "",
   });
+
+  // Fetch saved addresses on mount
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        setIsLoadingAddresses(true);
+        const result = await getAddresses();
+        if (result.success && result.data) {
+          setSavedAddresses(result.data);
+          // Auto-select default address if exists
+          const defaultAddress = result.data.find((addr: any) => addr.isDefault);
+          if (defaultAddress) {
+            setSelectedAddressId(defaultAddress.id);
+            // Pre-fill form with default address
+            setFormData((prev) => ({
+              ...prev,
+              firstName: defaultAddress.firstName,
+              lastName: defaultAddress.lastName,
+              phone: defaultAddress.phone,
+              email: defaultAddress.email || prev.email,
+              address: defaultAddress.address,
+              apartment: defaultAddress.apartment || "",
+              city: defaultAddress.city,
+              state: defaultAddress.state,
+              pinCode: defaultAddress.pinCode,
+              country: defaultAddress.country,
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching addresses:", error);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
+
+    fetchAddresses();
+  }, [session?.user?.email]);
+
+  // Handle address selection
+  const handleAddressSelect = (addressId: string) => {
+    setSelectedAddressId(addressId);
+
+    if (addressId === "new") {
+      // Clear form for new address
+      setFormData((prev) => ({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        email: session?.user?.email || "",
+        address: "",
+        apartment: "",
+        country: "India",
+        state: "",
+        city: "",
+        pinCode: "",
+        coupon: prev.coupon, // Keep coupon
+      }));
+    } else {
+      // Pre-fill form with selected address
+      const address = savedAddresses.find((addr) => addr.id === addressId);
+      if (address) {
+        setFormData((prev) => ({
+          ...prev,
+          firstName: address.firstName,
+          lastName: address.lastName,
+          phone: address.phone,
+          email: address.email || prev.email,
+          address: address.address,
+          apartment: address.apartment || "",
+          city: address.city,
+          state: address.state,
+          pinCode: address.pinCode,
+          country: address.country,
+        }));
+      }
+    }
+  };
 
   if (isPending) {
     return <div>Loading...</div>;
@@ -300,8 +385,90 @@ export default function CheckoutPage() {
           <div className="grid lg:grid-cols-[1fr_480px] gap-8">
             {/* Left Column - Delivery Form */}
             <div className="space-y-6">
+              {/* Saved Addresses Section */}
+              {savedAddresses.length > 0 && (
+                <Card className="p-6 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-primary" />
+                    <h2 className="text-xl font-semibold">Select Delivery Address</h2>
+                  </div>
+
+                  {isLoadingAddresses ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : (
+                    <RadioGroup value={selectedAddressId} onValueChange={handleAddressSelect}>
+                      <div className="space-y-3">
+                        {savedAddresses.map((address) => (
+                          <div
+                            key={address.id}
+                            className={`flex items-start space-x-3 rounded-lg border p-4 cursor-pointer transition-colors ${
+                              selectedAddressId === address.id
+                                ? "border-primary bg-primary/5"
+                                : "hover:border-primary/50"
+                            }`}
+                            onClick={() => handleAddressSelect(address.id)}
+                          >
+                            <RadioGroupItem value={address.id} id={address.id} />
+                            <Label htmlFor={address.id} className="flex-1 cursor-pointer space-y-1">
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">
+                                  {address.firstName} {address.lastName}
+                                </p>
+                                {address.isDefault && (
+                                  <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                    Default
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {address.address}
+                                {address.apartment && `, ${address.apartment}`}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {address.city}, {address.state} {address.pinCode}
+                              </p>
+                              <p className="text-sm text-muted-foreground">{address.phone}</p>
+                            </Label>
+                          </div>
+                        ))}
+
+                        {/* Use New Address Option */}
+                        <div
+                          className={`flex items-start space-x-3 rounded-lg border p-4 cursor-pointer transition-colors ${
+                            selectedAddressId === "new"
+                              ? "border-primary bg-primary/5"
+                              : "hover:border-primary/50"
+                          }`}
+                          onClick={() => handleAddressSelect("new")}
+                        >
+                          <RadioGroupItem value="new" id="new" />
+                          <Label htmlFor="new" className="flex-1 cursor-pointer">
+                            <p className="font-medium">Use a new address</p>
+                            <p className="text-sm text-muted-foreground">
+                              Enter a new delivery address below
+                            </p>
+                          </Label>
+                        </div>
+                      </div>
+                    </RadioGroup>
+                  )}
+                </Card>
+              )}
+
+              {/* Delivery Form */}
               <Card className="p-6 space-y-2">
-                <h2 className="text-xl font-semibold">Delivery</h2>
+                <h2 className="text-xl font-semibold">
+                  {selectedAddressId === "new" || savedAddresses.length === 0
+                    ? "Delivery Address"
+                    : "Edit Delivery Details"}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {selectedAddressId !== "new" && savedAddresses.length > 0
+                    ? "You can edit the selected address details below"
+                    : "Enter your delivery information"}
+                </p>
 
                 {/* Name */}
                 <div className="grid grid-cols-2 gap-4">

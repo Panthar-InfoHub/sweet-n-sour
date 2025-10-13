@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { MapPin, Plus, Edit, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import type { Address } from "@/lib/types"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
+import { useState, useEffect } from "react";
+import { MapPin, Plus, Edit, Trash2, Loader2, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,33 +22,164 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import {
+  getAddresses,
+  addAddress,
+  updateAddress,
+  deleteAddress,
+  setDefaultAddress,
+} from "@/actions/store/address.actions";
 
-// Mock addresses
-const mockAddresses: Address[] = [
-  {
-    id: "1",
-    userId: "1",
-    fullName: "John Doe",
-    phone: "9876543210",
-    addressLine1: "123 Main Street",
-    addressLine2: "Apartment 4B",
-    city: "Mumbai",
-    state: "Maharashtra",
-    zipCode: "400001",
-    country: "India",
-    isDefault: true,
-  },
-]
+interface Address {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string | null;
+  address: string;
+  apartment?: string | null;
+  city: string;
+  state: string;
+  pinCode: string;
+  country: string;
+  isDefault: boolean;
+}
 
 export function AddressesList() {
-  const [addresses, setAddresses] = useState<Address[]>(mockAddresses)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    address: "",
+    apartment: "",
+    city: "",
+    state: "",
+    pinCode: "",
+    country: "India",
+    isDefault: false,
+  });
 
-  const handleDelete = (id: string) => {
-    setAddresses(addresses.filter((addr) => addr.id !== id))
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  const fetchAddresses = async () => {
+    setIsLoading(true);
+    const result = await getAddresses();
+    if (result.success && result.data) {
+      setAddresses(result.data);
+    }
+    setIsLoading(false);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      firstName: "",
+      lastName: "",
+      phone: "",
+      email: "",
+      address: "",
+      apartment: "",
+      city: "",
+      state: "",
+      pinCode: "",
+      country: "India",
+      isDefault: false,
+    });
+    setEditingAddress(null);
+  };
+
+  const handleOpenDialog = (address?: Address) => {
+    if (address) {
+      setEditingAddress(address);
+      setFormData({
+        firstName: address.firstName,
+        lastName: address.lastName,
+        phone: address.phone,
+        email: address.email || "",
+        address: address.address,
+        apartment: address.apartment || "",
+        city: address.city,
+        state: address.state,
+        pinCode: address.pinCode,
+        country: address.country,
+        isDefault: address.isDefault,
+      });
+    } else {
+      resetForm();
+    }
+    setIsAddDialogOpen(true);
+  };
+
+  const handleSave = async () => {
+    // Validation
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.phone ||
+      !formData.address ||
+      !formData.city ||
+      !formData.state ||
+      !formData.pinCode
+    ) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setIsSaving(true);
+
+    const result = editingAddress
+      ? await updateAddress(editingAddress.id, formData)
+      : await addAddress(formData);
+
+    setIsSaving(false);
+
+    if (result.success) {
+      toast.success(editingAddress ? "Address updated" : "Address added");
+      setIsAddDialogOpen(false);
+      resetForm();
+      fetchAddresses();
+    } else {
+      toast.error(result.error || "Failed to save address");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const result = await deleteAddress(id);
+    if (result.success) {
+      toast.success("Address deleted");
+      fetchAddresses();
+    } else {
+      toast.error(result.error || "Failed to delete address");
+    }
+  };
+
+  const handleSetDefault = async (id: string) => {
+    const result = await setDefaultAddress(id);
+    if (result.success) {
+      toast.success("Default address updated");
+      fetchAddresses();
+    } else {
+      toast.error(result.error || "Failed to set default address");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
@@ -52,55 +189,153 @@ export function AddressesList() {
           <h2 className="text-2xl font-bold">Saved Addresses</h2>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary-hover">
+              <Button
+                className="bg-primary hover:bg-primary-hover"
+                onClick={() => handleOpenDialog()}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add New Address
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Add New Address</DialogTitle>
+                <DialogTitle>{editingAddress ? "Edit Address" : "Add New Address"}</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="fullName">Full Name</Label>
-                    <Input id="fullName" placeholder="John Doe" />
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                      placeholder="John"
+                    />
                   </div>
                   <div>
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" placeholder="9876543210" />
+                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Input
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                      placeholder="Doe"
+                    />
+                  </div>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="phone">Phone *</Label>
+                    <Input
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder="9876543210"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="john@example.com"
+                    />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="addressLine1">Address Line 1</Label>
-                  <Input id="addressLine1" placeholder="Street address" />
+                  <Label htmlFor="address">Address *</Label>
+                  <Input
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="Street address"
+                  />
                 </div>
                 <div>
-                  <Label htmlFor="addressLine2">Address Line 2 (Optional)</Label>
-                  <Input id="addressLine2" placeholder="Apartment, suite, etc." />
+                  <Label htmlFor="apartment">Apartment / Suite / Unit</Label>
+                  <Input
+                    id="apartment"
+                    value={formData.apartment}
+                    onChange={(e) => setFormData({ ...formData, apartment: e.target.value })}
+                    placeholder="Apartment 4B"
+                  />
                 </div>
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="city">City</Label>
-                    <Input id="city" placeholder="Mumbai" />
+                    <Label htmlFor="city">City *</Label>
+                    <Input
+                      id="city"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      placeholder="Mumbai"
+                    />
                   </div>
                   <div>
-                    <Label htmlFor="state">State</Label>
-                    <Input id="state" placeholder="Maharashtra" />
+                    <Label htmlFor="state">State *</Label>
+                    <Input
+                      id="state"
+                      value={formData.state}
+                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                      placeholder="Maharashtra"
+                    />
                   </div>
                   <div>
-                    <Label htmlFor="zipCode">PIN Code</Label>
-                    <Input id="zipCode" placeholder="400001" />
+                    <Label htmlFor="pinCode">PIN Code *</Label>
+                    <Input
+                      id="pinCode"
+                      value={formData.pinCode}
+                      onChange={(e) => setFormData({ ...formData, pinCode: e.target.value })}
+                      placeholder="400001"
+                    />
                   </div>
+                </div>
+                <div>
+                  <Label htmlFor="country">Country *</Label>
+                  <Input
+                    id="country"
+                    value={formData.country}
+                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                    placeholder="India"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="isDefault"
+                    checked={formData.isDefault}
+                    onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
+                    className="h-4 w-4"
+                  />
+                  <Label htmlFor="isDefault" className="cursor-pointer">
+                    Set as default address
+                  </Label>
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddDialogOpen(false);
+                    resetForm();
+                  }}
+                  disabled={isSaving}
+                >
                   Cancel
                 </Button>
-                <Button className="bg-primary hover:bg-primary-hover" onClick={() => setIsAddDialogOpen(false)}>
-                  Save Address
+                <Button
+                  className="bg-primary hover:bg-primary-hover"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Address"
+                  )}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -117,27 +352,58 @@ export function AddressesList() {
           <div className="grid sm:grid-cols-2 gap-4">
             {addresses.map((address) => (
               <div key={address.id} className="border border-border rounded-lg p-6 relative">
-                {address.isDefault && <Badge className="absolute top-4 right-4">Default</Badge>}
+                {address.isDefault && (
+                  <Badge className="absolute top-4 right-4 bg-green-500">
+                    <Check className="h-3 w-3 mr-1" />
+                    Default
+                  </Badge>
+                )}
 
                 <div className="mb-4">
-                  <p className="font-semibold text-lg mb-1">{address.fullName}</p>
+                  <p className="font-semibold text-lg mb-1">
+                    {address.firstName} {address.lastName}
+                  </p>
                   <p className="text-sm text-foreground-muted">
-                    {address.addressLine1}
-                    {address.addressLine2 && (
+                    {address.address}
+                    {address.apartment && (
                       <>
                         <br />
-                        {address.addressLine2}
+                        {address.apartment}
                       </>
                     )}
                     <br />
-                    {address.city}, {address.state} {address.zipCode}
+                    {address.city}, {address.state} - {address.pinCode}
+                    <br />
+                    {address.country}
                     <br />
                     Phone: {address.phone}
+                    {address.email && (
+                      <>
+                        <br />
+                        Email: {address.email}
+                      </>
+                    )}
                   </p>
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                  {!address.isDefault && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-transparent"
+                      onClick={() => handleSetDefault(address.id)}
+                    >
+                      <Check className="h-4 w-4 mr-2" />
+                      Set Default
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-transparent"
+                    onClick={() => handleOpenDialog(address)}
+                  >
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </Button>
@@ -155,7 +421,8 @@ export function AddressesList() {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Delete Address</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to delete this address? This action cannot be undone.
+                          Are you sure you want to delete this address? This action cannot be
+                          undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -176,5 +443,5 @@ export function AddressesList() {
         )}
       </div>
     </div>
-  )
+  );
 }

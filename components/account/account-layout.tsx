@@ -3,9 +3,11 @@
 import type React from "react";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { User, Package, MapPin, Heart, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 interface AccountLayoutProps {
   children: React.ReactNode;
@@ -16,11 +18,22 @@ const navigation = [
   { name: "Orders", href: "/account/orders", icon: Package },
   { name: "Addresses", href: "/account/addresses", icon: MapPin },
   { name: "Wishlist", href: "/account/wishlist", icon: Heart },
-  { name: "Profile Settings", href: "/account/profile", icon: User },
 ];
 
 export function AccountLayout({ children }: AccountLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut();
+      toast.success("Logged out successfully");
+      router.push("/");
+    } catch (error) {
+      toast.error("Failed to logout");
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <div className="container-custom">
@@ -51,10 +64,7 @@ export function AccountLayout({ children }: AccountLayoutProps) {
 
             <button
               className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-destructive hover:bg-destructive/10 w-full mt-4"
-              onClick={() => {
-                // Handle logout
-                console.log("Logout");
-              }}
+              onClick={handleLogout}
             >
               <LogOut className="h-5 w-5" />
               <span className="font-medium">Logout</span>

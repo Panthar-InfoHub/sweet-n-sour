@@ -38,10 +38,8 @@ export default function WishlistPage() {
 
   if (isPending || isLoading) {
     return (
-      <div className="container-custom py-12">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -51,63 +49,65 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="container-custom py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Heart className="h-8 w-8 text-red-500 fill-red-500" />
-            My Wishlist
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            {items.length} {items.length === 1 ? "item" : "items"} saved for later
-          </p>
+    <>
+      <div className="bg-white rounded-lg border border-border p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold flex items-center gap-3">
+              <Heart className="h-6 w-6 text-red-500 fill-red-500" />
+              My Wishlist
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              {items.length} {items.length === 1 ? "item" : "items"} saved for later
+            </p>
+          </div>
+
+          {items.length > 0 && (
+            <Button variant="outline" onClick={handleClearWishlist} disabled={isClearing}>
+              {isClearing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Clearing...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear Wishlist
+                </>
+              )}
+            </Button>
+          )}
         </div>
 
-        {items.length > 0 && (
-          <Button variant="outline" onClick={handleClearWishlist} disabled={isClearing}>
-            {isClearing ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Clearing...
-              </>
-            ) : (
-              <>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Clear Wishlist
-              </>
-            )}
-          </Button>
-        )}
-      </div>
-
-      {/* Wishlist Items */}
-      {items.length === 0 ? (
-        <EmptyState
-          icon={<Heart className="h-16 w-16" />}
-          title="Your wishlist is empty"
-          description="Save items you love to your wishlist and shop them later"
-          action={
+        {/* Wishlist Items */}
+        {items.length === 0 ? (
+          <div className="text-center py-12">
+            <Heart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Your wishlist is empty</h3>
+            <p className="text-muted-foreground mb-6">
+              Save items you love to your wishlist and shop them later
+            </p>
             <Link href="/products">
               <Button>
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Browse Products
               </Button>
             </Link>
-          }
-        />
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {items.map((item) => (
-            <ProductCard key={item.id} product={item.product} />
-          ))}
-        </div>
-      )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((item) => (
+              <ProductCard key={item.id} product={item.product} />
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Quick Actions */}
       {items.length > 0 && (
-        <div className="mt-12 p-6 bg-surface rounded-lg border border-border">
-          <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+        <div className="p-6 bg-white rounded-lg border border-border">
+          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
           <div className="flex flex-wrap gap-4">
             <Link href="/products">
               <Button variant="outline">
@@ -121,6 +121,6 @@ export default function WishlistPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -17,10 +17,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Truck, X, Trash2 } from "lucide-react";
+import { MoreHorizontal, Eye, Truck, CreditCard, Trash2 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/utils/format";
 import { OrderDetailsDialog } from "./order-details-dialog";
 import { OrderStatusDialog } from "./order-status-dialog";
+import { PaymentStatusDialog } from "./payment-status-dialog";
 import { OrderStatus } from "@/prisma/generated/prisma";
 import { deleteOrder } from "@/actions/admin/order.actions";
 import { useRouter } from "next/navigation";
@@ -87,7 +88,8 @@ const getPaymentStatusColor = (status: string) => {
 export function OrdersTable({ orders }: OrdersTableProps) {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const [isOrderStatusOpen, setIsOrderStatusOpen] = useState(false);
+  const [isPaymentStatusOpen, setIsPaymentStatusOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
   const router = useRouter();
@@ -97,9 +99,14 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     setIsDetailsOpen(true);
   };
 
-  const handleUpdateStatus = (orderId: string) => {
+  const handleUpdateOrderStatus = (orderId: string) => {
     setSelectedOrderId(orderId);
-    setIsStatusOpen(true);
+    setIsOrderStatusOpen(true);
+  };
+
+  const handleUpdatePaymentStatus = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setIsPaymentStatusOpen(true);
   };
 
   const handleDeleteClick = (orderId: string) => {
@@ -186,9 +193,13 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleUpdateStatus(order.id)}>
+                        <DropdownMenuItem onClick={() => handleUpdateOrderStatus(order.id)}>
                           <Truck className="h-4 w-4 mr-2" />
-                          Update Status
+                          Update Order Status
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleUpdatePaymentStatus(order.id)}>
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Update Payment Status
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
@@ -215,8 +226,14 @@ export function OrdersTable({ orders }: OrdersTableProps) {
 
       <OrderStatusDialog
         orderId={selectedOrderId}
-        open={isStatusOpen}
-        onOpenChange={setIsStatusOpen}
+        open={isOrderStatusOpen}
+        onOpenChange={setIsOrderStatusOpen}
+      />
+
+      <PaymentStatusDialog
+        orderId={selectedOrderId}
+        open={isPaymentStatusOpen}
+        onOpenChange={setIsPaymentStatusOpen}
       />
 
       <DeleteConfirmDialog

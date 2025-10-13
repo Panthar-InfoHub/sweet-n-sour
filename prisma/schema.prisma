@@ -190,19 +190,22 @@ model OrderItem {
 }
 
 model Address {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   firstName String
   lastName  String
   phone     String
   email     String?
   address   String
   apartment String?
-  country   String  @default("India")
+  country   String   @default("India")
   state     String
   city      String
   pinCode   String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("address")
 }
