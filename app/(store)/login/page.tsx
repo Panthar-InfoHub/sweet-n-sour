@@ -26,13 +26,7 @@ export default function LoginPage() {
         <div className="bg-white/80 backdrop-blur-sm border border-border shadow-xl rounded-2xl p-8 md:p-10">
           {/* Logo */}
           <div className="flex justify-center mb-6">
-            <Image
-              src="/logo.svg"
-              alt="Brand Logo"
-              width={48}
-              height={48}
-              className="rounded-lg"
-            />
+            <Image src="/logo.svg" alt="Brand Logo" width={48} height={48} className="rounded-lg" />
           </div>
 
           {/* Headings */}
@@ -49,13 +43,7 @@ export default function LoginPage() {
             className="w-full py-5 text-[15px] font-medium flex items-center justify-center gap-2 hover:bg-neutral-50 transition-colors"
             onClick={handleSignIn}
           >
-            <Image
-              src="/images/google.svg"
-              alt="Google"
-              width={20}
-              height={20}
-              className="mr-1"
-            />
+            <Image src="/images/google.svg" alt="Google" width={20} height={20} className="mr-1" />
             Continue with Google
           </Button>
 
@@ -68,7 +56,8 @@ export default function LoginPage() {
             and{" "}
             <a href="/privacy" className="underline hover:text-primary">
               Privacy Policy
-            </a>.
+            </a>
+            .
           </p>
         </div>
       </div>

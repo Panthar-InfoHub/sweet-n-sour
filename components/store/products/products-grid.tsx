@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ProductCard } from "@/components/products/product-card";
+import { ProductCard } from "@/components/store/products/product-card";
 import {
   Select,
   SelectContent,
@@ -11,35 +11,11 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
-
-interface Variant {
-  weight: string;
-  price: number;
-  compareAtPrice: number | null;
-  stockQuantity: number;
-  inStock: boolean;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  images: string[];
-  variants: Variant[] | any;
-  category: {
-    id: string;
-    name: string;
-  };
-  isBestSeller: boolean;
-  isOnSale: boolean;
-  tags: string[];
-}
+import { Product } from "@/components/store/products/product-card";
 
 interface ProductsGridProps {
   products: Product[];
 }
-
 export function ProductsGrid({ products }: ProductsGridProps) {
   const [sortBy, setSortBy] = useState("featured");
 

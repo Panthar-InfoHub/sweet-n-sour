@@ -1,4 +1,4 @@
-import { AddressesList } from "@/components/account/addresses-list";
+import { AddressesList } from "@/components/store/account/addresses-list";
 
 export default function AddressesPage() {
   return <AddressesList />;

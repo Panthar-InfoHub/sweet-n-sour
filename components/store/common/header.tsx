@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { CartDrawer } from "@/components/cart/cart-drawer";
+import { CartDrawer } from "@/components/store/cart/cart-drawer";
 import { useCart } from "@/hooks/use-cart-db";
 import { useWishlist } from "@/hooks/use-wishlist";
 

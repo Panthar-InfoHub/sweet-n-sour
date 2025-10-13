@@ -1,5 +1,5 @@
-import { ProductDetail } from "@/components/products/product-detail";
-import { RelatedProducts } from "@/components/products/related-products";
+import { ProductDetail } from "@/components/store/products/product-detail";
+import { RelatedProducts } from "@/components/store/products/related-products";
 import { getProductBySlug } from "@/actions/admin/product.actions";
 import { notFound } from "next/navigation";
 

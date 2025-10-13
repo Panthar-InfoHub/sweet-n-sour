@@ -1,4 +1,3 @@
-
 export default function TermsAndConditionsPage() {
   return (
     <main className="min-h-screen bg-background">

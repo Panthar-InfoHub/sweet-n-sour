@@ -70,6 +70,8 @@ export function ProductsTable() {
   const fetchProducts = async () => {
     setIsLoading(true);
     const result = await getProducts();
+
+    console.log("Fetched products:", result);
     if (result.success && result.data) {
       setProducts(result.data as any);
 

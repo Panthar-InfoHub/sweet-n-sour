@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/components/providers/cart-provider";
 import { WishlistSync } from "@/components/providers/wishlist-sync";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,11 +36,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground" suppressHydrationWarning>
-        <CartProvider>
-          <WishlistSync />
-          {children}
-        </CartProvider>
-        <Toaster />
+        <ThemeProvider>
+          <CartProvider>
+            <WishlistSync />
+            {children}
+          </CartProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

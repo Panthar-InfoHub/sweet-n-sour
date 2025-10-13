@@ -1,6 +1,6 @@
-import { AnnouncementBar } from "@/components/store/announcement-bar";
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
+import { AnnouncementBar } from "@/components/store/common/announcement-bar";
+import { Footer } from "@/components/store/common/footer";
+import { Header } from "@/components/store/common/header";
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (

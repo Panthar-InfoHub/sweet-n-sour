@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useWishlist } from "@/hooks/use-wishlist";
-import { ProductCard } from "@/components/products/product-card";
+import { ProductCard } from "@/components/store/products/product-card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -103,24 +103,6 @@ export default function WishlistPage() {
           </div>
         )}
       </div>
-
-      {/* Quick Actions */}
-      {items.length > 0 && (
-        <div className="p-6 bg-white rounded-lg border border-border">
-          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/products">
-              <Button variant="outline">
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Continue Shopping
-              </Button>
-            </Link>
-            <Link href="/account/orders">
-              <Button variant="outline">View Orders</Button>
-            </Link>
-          </div>
-        </div>
-      )}
     </>
   );
 }

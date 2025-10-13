@@ -1,4 +1,4 @@
-import { ProductCard } from "@/components/products/product-card";
+import { ProductCard } from "@/components/store/products/product-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getProducts } from "@/actions/admin/product.actions";

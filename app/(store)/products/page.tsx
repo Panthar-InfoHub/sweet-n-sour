@@ -1,10 +1,19 @@
-import { ProductsGrid } from "@/components/products/products-grid";
-import { ProductFilters } from "@/components/products/product-filters";
+import { ProductsGrid } from "@/components/store/products/products-grid";
+import { ProductFilters } from "@/components/store/products/product-filters";
 import { getProducts } from "@/actions/admin/product.actions";
+import { Product, ProductVariant } from "@/components/store/products/product-card";
 
 export default async function ProductsPage() {
   const result = await getProducts({});
-  const products = result.success ? result.data || [] : [];
+  const rawProducts = result.success ? result.data || [] : [];
+
+  // Transform products to match the Product type
+  const products: Product[] = rawProducts.map((product) => ({
+    ...product,
+    variants: (product.variants as unknown as ProductVariant[]) || [],
+    tags: product.tags || [],
+    images: product.images || [],
+  }));
 
   return (
     <main className="min-h-screen">
