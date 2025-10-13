@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getSignedViewUrl } from "@/lib/cloud-storage";
 import {
   Table,
   TableBody,
@@ -65,7 +64,6 @@ export function ProductsTable() {
   const [productForStock, setProductForStock] = useState<Product | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isStockOpen, setIsStockOpen] = useState(false);
-  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -73,23 +71,8 @@ export function ProductsTable() {
 
     console.log("Fetched products:", result);
     if (result.success && result.data) {
+      // Products already have signed URLs from the server action
       setProducts(result.data as any);
-
-      // Fetch signed URLs for all product images
-      const urls: Record<string, string> = {};
-      await Promise.all(
-        (result.data as any).map(async (product: Product) => {
-          if (product.images && product.images.length > 0) {
-            try {
-              const signedUrl = await getSignedViewUrl(product.images[0]);
-              urls[product.id] = signedUrl;
-            } catch (error) {
-              console.error("Error fetching signed URL:", error);
-            }
-          }
-        })
-      );
-      setSignedUrls(urls);
     } else {
       toast.error(result.error || "Failed to fetch products");
     }
@@ -197,7 +180,7 @@ export function ProductsTable() {
                 <TableCell>
                   <div className="relative h-12 w-12 rounded-md overflow-hidden bg-muted">
                     <Image
-                      src={signedUrls[product.id] || "/placeholder.svg"}
+                      src={product.images?.[0] || "/placeholder.svg"}
                       alt={product.name}
                       fill
                       className="object-cover"

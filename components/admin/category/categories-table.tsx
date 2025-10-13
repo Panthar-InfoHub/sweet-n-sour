@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getSignedViewUrl } from "@/lib/cloud-storage";
 import {
   Table,
   TableBody,
@@ -40,29 +39,13 @@ export function CategoriesTable() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
-  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
 
   const fetchCategories = async () => {
     setIsLoading(true);
     const result = await getCategories();
     if (result.success && result.data) {
+      // Categories already have signed URLs from the server action
       setCategories(result.data as any);
-
-      // Fetch signed URLs for all category images
-      const urls: Record<string, string> = {};
-      await Promise.all(
-        (result.data as any).map(async (category: Category) => {
-          if (category.image) {
-            try {
-              const signedUrl = await getSignedViewUrl(category.image);
-              urls[category.id] = signedUrl;
-            } catch (error) {
-              console.error("Error fetching signed URL:", error);
-            }
-          }
-        })
-      );
-      setSignedUrls(urls);
     } else {
       toast.error(result.error || "Failed to fetch categories");
     }
@@ -134,7 +117,7 @@ export function CategoriesTable() {
                 <TableCell>
                   <div className="relative h-12 w-12 rounded-md overflow-hidden bg-muted">
                     <Image
-                      src={signedUrls[category.id] || "/placeholder.svg"}
+                      src={category.image || "/placeholder.svg"}
                       alt={category.name}
                       fill
                       className="object-cover"

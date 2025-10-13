@@ -36,7 +36,7 @@ export function MediaSection({
   maxFiles = 10,
   maxSizeMB = 5,
 }: MediaSectionProps) {
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>(media);
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
   const [previewUrls, setPreviewUrls] = useState<{ [key: string]: string }>({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [localPreviews, setLocalPreviews] = useState<PreviewFile[]>([]);
@@ -45,9 +45,15 @@ export function MediaSection({
   const [loadingUrls, setLoadingUrls] = useState(true);
   const [videoPlayUrl, setVideoPlayUrl] = useState<string | null>(null);
 
-  // Fetch signed view URLs for existing media
+  // Sync uploadedFiles when media prop changes
   useEffect(() => {
-    async function fetchUrls() {
+    setUploadedFiles(media);
+  }, [media]);
+
+  // Initialize preview URLs for existing media
+  // Media paths from edit forms already have signed URLs from server actions
+  useEffect(() => {
+    async function initializeUrls() {
       if (media.length === 0) {
         setLoadingUrls(false);
         return;
@@ -57,19 +63,25 @@ export function MediaSection({
         const map: Record<string, string> = {};
         await Promise.all(
           media.map(async (path) => {
-            const url = await getSignedViewUrl(path);
-            map[path] = url;
+            // Check if path is already a signed URL (starts with http/https)
+            if (path.startsWith("http://") || path.startsWith("https://")) {
+              map[path] = path; // Already signed
+            } else {
+              // Not signed yet, fetch signed URL
+              const signedUrl = await getSignedViewUrl(path);
+              map[path] = signedUrl;
+            }
           })
         );
         setPreviewUrls(map);
       } catch (error) {
-        toast.error("Error loading images. Failed to load some media files");
+        toast.error("Failed to load some media files");
       } finally {
         setLoadingUrls(false);
       }
     }
-    fetchUrls();
-  }, [media, toast]);
+    initializeUrls();
+  }, [media]);
 
   // Cleanup preview URLs when component unmounts
   useEffect(() => {
@@ -259,17 +271,20 @@ export function MediaSection({
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
           {uploadedFiles.map((path) => {
             const url = previewUrls[path];
+            // Detect video from both path and URL (handle both raw paths and signed URLs)
             const isVideo =
-              path?.match(/\.(mp4|mov|webm|avi)$/i) || url?.match(/\.(mp4|mov|webm|avi)$/i);
+              path?.match(/\.(mp4|mov|webm|avi|MOV|MP4|WEBM|AVI)($|\?)/i) ||
+              url?.match(/\.(mp4|mov|webm|avi|MOV|MP4|WEBM|AVI)($|\?)/i);
+
             return (
-              <Card key={path} className="relative overflow-hidden group aspect-square">
+              <Card key={path} className="relative overflow-hidden group aspect-square p-0">
                 {url ? (
                   isVideo ? (
                     <div
-                      className="w-full h-full relative cursor-pointer"
+                      className="w-full h-full relative cursor-pointer flex items-center justify-center bg-black"
                       onClick={() => setVideoPlayUrl(url)}
                     >
-                      <video src={url} className="w-full h-full object-cover" muted />
+                      <video src={url} className="max-w-full max-h-full object-contain" muted />
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/50 transition-colors">
                         <div className="bg-white rounded-full p-3 shadow-lg">
                           <Play className="h-5 w-5 text-black fill-black" />
@@ -277,7 +292,9 @@ export function MediaSection({
                       </div>
                     </div>
                   ) : (
-                    <img src={url} alt="Media" className="w-full h-full object-cover" />
+                    <div className="w-full h-full flex items-center justify-center bg-muted p-2">
+                      <img src={url} alt="Media" className="max-w-full max-h-full object-contain" />
+                    </div>
                   )
                 ) : (
                   <div className="w-full h-full bg-muted animate-pulse" />
