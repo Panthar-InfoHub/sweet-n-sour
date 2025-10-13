@@ -2,18 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import { signIn } from "@/lib/auth-client";
-import { useSearchParams } from "next/navigation";
+// import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 export default function LoginPage() {
-  const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/";
+  // const searchParams = useSearchParams();
+  // const redirect = searchParams.get("redirect") || "/";
 
   const handleSignIn = async () => {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: redirect,
+        callbackURL: "/",
       });
     } catch (error) {
       console.error("Error during sign-in:", error);

@@ -1,6 +1,5 @@
 import { Suspense } from "react"
 
-import { PagesTable } from "@/components/admin/cms/pages-table"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
@@ -21,7 +20,7 @@ export default function AdminPagesPage() {
         </div>
 
         <Suspense fallback={<LoadingSpinner />}>
-          <PagesTable />
+          <h1>Page List (to be implemented)</h1>
         </Suspense>
       </div>
 
