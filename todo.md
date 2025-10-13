@@ -1,0 +1,6 @@
+- social links - like - instagram , twitter , facebook
+- brand name 
+- brand description 
+- quick links 
+- all policy pages
+- contact details page - liek address , email , phone number

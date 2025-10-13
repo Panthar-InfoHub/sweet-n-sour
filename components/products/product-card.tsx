@@ -1,146 +1,202 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { Heart, ShoppingCart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { formatPrice, calculateDiscount } from "@/utils/format";
-import { useCart } from "@/hooks/use-cart";
-import { toast } from "sonner";
 import { useState } from "react";
-
-interface Variant {
-  weight: string;
-  price: number;
-  compareAtPrice: number | null;
-  stockQuantity: number;
-  inStock: boolean;
-}
+import Image from "next/image";
+import { Heart, ShoppingBag, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useCart } from "@/hooks/use-cart";
+import { CartItem } from "@/lib/types";
+import { toast } from "sonner";
 
 interface ProductCardProps {
-  product: {
-    id: string;
-    name: string;
-    slug: string;
-    images: string[];
-    variants: Variant[];
-    isBestSeller: boolean;
-    isOnSale: boolean;
-  };
+  product: Product;
+  onToggleWishlist?: (productId: string) => void;
+  isInWishlist?: boolean;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
-  const { addItem } = useCart();
-  const [selectedVariant, setSelectedVariant] = useState(0);
+export function ProductCard({ product, onToggleWishlist, isInWishlist = false }: ProductCardProps) {
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const { addItem, items } = useCart();
+  const selectedVariant = product.variants[selectedVariantIndex];
 
-  // Safety check for variants
-  if (!product.variants || product.variants.length === 0) {
-    return null;
-  }
-
-  const variant = product.variants[selectedVariant];
-  const discount = variant.compareAtPrice
-    ? calculateDiscount(variant.price, variant.compareAtPrice)
+  // Calculate discount percentage
+  const discountPercentage = selectedVariant.compareAtPrice
+    ? Math.round(
+        ((selectedVariant.compareAtPrice - selectedVariant.price) /
+          selectedVariant.compareAtPrice) *
+          100
+      )
     : 0;
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
-    if (!variant.inStock) {
-      toast.error("This product is out of stock");
-      return;
-    }
-
-    addItem({
+    e.stopPropagation();
+    const item: Omit<CartItem, "id"> = {
       productId: product.id,
       name: product.name,
-      price: variant.price,
+      price: selectedVariant.price,
       image: product.images[0] || "/placeholder.svg",
-      weight: variant.weight,
+      weight: selectedVariant.weight,
       quantity: 1,
-    });
+    };
+    addItem(item);
+    toast.success("Added to cart", { duration: 1000 });
+  };
 
-    toast.success(`${product.name} (${variant.weight}) added to cart!`);
+  const handleToggleWishlist = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onToggleWishlist?.(product.id);
   };
 
   return (
-    <div className="group relative bg-white rounded-lg border border-border hover:shadow-lg transition-shadow">
-      {/* Sale Badge */}
-      {product.isOnSale && discount > 0 && (
-        <Badge variant="destructive" className="absolute top-3 left-3 z-10">
-          {discount}% OFF
-        </Badge>
+    <Link
+      href={`/products/${product.slug}`}
+      className="group relative w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-md transition-shadow hover:shadow-lg"
+    >
+      {/* Discount Badge */}
+      {discountPercentage > 0 && product.isOnSale && (
+        <div className="absolute left-0 top-0 h-24 w-24 z-10">
+          <div className="absolute shadow-md transform -rotate-45 bg-brand-primary-2 text-center text-white font-semibold py-1 right-[-35px] top-[32px] w-[170px]">
+            {discountPercentage}% OFF
+          </div>
+        </div>
       )}
 
       {/* Wishlist Button */}
-      <button
-        className="absolute top-3 right-3 z-10 h-8 w-8 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
+      <Button
+        onClick={handleToggleWishlist}
+        size={"icon-sm"}
+        variant="ghost"
+        className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition-all hover:scale-110 hover:shadow-lg "
         aria-label="Add to wishlist"
       >
-        <Heart className="h-4 w-4" />
-      </button>
+        <Heart
+          className={cn(
+            "h-5 w-5 transition-colors",
+            isInWishlist ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"
+          )}
+        />
+      </Button>
 
       {/* Product Image */}
-      <Link href={`/products/${product.slug}`} className="block">
-        <div className="relative aspect-square overflow-hidden rounded-t-lg bg-surface">
-          <Image
-            src={product.images[0] || "/placeholder.svg"}
-            alt={product.name}
-            fill
-            className="object-contain p-4 group-hover:scale-110 transition-transform duration-300"
-          />
-        </div>
-      </Link>
+      <div className="relative aspect-square w-full overflow-hidden  p-8">
+        <Image src={"/images/dummy-2.png"} alt={product.name} fill className="object-contain" />
+      </div>
 
-      {/* Product Info */}
-      <div className="p-4">
-        <Link href={`/products/${product.slug}`}>
-          <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
-            {product.name}
-          </h3>
-        </Link>
+      {/* Product Details */}
+      <div className="  p-3">
+        {/* Category and Rating */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm  capitalize text-muted-foreground">{product.category.name}</span>
+          <div className="flex items-center gap-1">
+            <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-medium">4.5</span>
+          </div>
+        </div>
+
+        {/* Product Name */}
+        <h3 className="text-xl font-bold capitalize">{product.name}</h3>
 
         {/* Variant Selector */}
-        {product.variants.length > 0 && (
-          <div className="flex gap-2 mb-2">
-            {product.variants.map((v, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedVariant(index)}
-                className={`text-xs px-2 py-1 rounded border transition-colors ${
-                  selectedVariant === index
-                    ? "border-primary bg-primary text-white"
-                    : "border-border hover:border-primary"
-                }`}
-              >
-                {v.weight}
-              </button>
-            ))}
-          </div>
+        {product.variants.length > 1 && (
+          <p className="text-sm font-semibold text-muted-foreground">
+            {product.variants[selectedVariantIndex].weight}
+          </p>
+          // <div className="flex flex-wrap gap-2 ">
+          //   {product.variants.map((variant, index) => (
+          //     // <Button
+
+          //       key={index}
+          //       size={"sm"}
+          //       variant={"outline"}
+          //       onClick={() => setSelectedVariantIndex(index)}
+          //       className={""}
+          //     >
+          //       {variant.weight}
+          //     </Button>
+          //   ))}
+          // </div>
         )}
 
-        {/* Price */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-primary">{formatPrice(variant.price)}</span>
-          {variant.compareAtPrice && (
-            <span className="text-sm text-foreground-muted line-through">
-              {formatPrice(variant.compareAtPrice)}
-            </span>
-          )}
+        {/* Single Variant Display */}
+        {product.variants.length === 1 && (
+          <p className="text-sm font-semibold text-muted-foreground">{selectedVariant.weight}</p>
+        )}
+
+        {/* Price and Add to Cart */}
+        <div className="flex items-center justify-between gap-4 pt-2">
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-bold text-gray-900">₹{selectedVariant.price}</span>
+            {selectedVariant.compareAtPrice && (
+              <span className="text-lg text-gray-400 line-through">
+                ₹{selectedVariant.compareAtPrice}
+              </span>
+            )}
+          </div>
+
+          <Button
+            onClick={handleAddToCart}
+            // size={"sm"}
+            disabled={
+              !selectedVariant.inStock ||
+              items.find((i) => i.id.startsWith(`${product.id}-${selectedVariant.weight}`))
+                ? true
+                : false
+            }
+            className="rounded-full"
+          >
+            <ShoppingBag className="h-5 w-5" />
+            {items.find((i) => i.id.startsWith(`${product.id}-${selectedVariant.weight}`))
+              ? "Added"
+              : "Add"}
+          </Button>
         </div>
 
-        {/* Add to Cart Button */}
-        <Button
-          className="w-full bg-primary hover:bg-primary-hover"
-          size="sm"
-          onClick={handleAddToCart}
-          disabled={!variant.inStock}
-        >
-          <ShoppingCart className="h-4 w-4 mr-2" />
-          {variant.inStock ? "Add to Cart" : "Out of Stock"}
-        </Button>
+        {/* Stock Status */}
+        {!selectedVariant.inStock && (
+          <p className="text-sm font-medium text-red-500">Out of Stock</p>
+        )}
       </div>
-    </div>
+    </Link>
   );
+}
+
+export interface ProductVariant {
+  price: number;
+  weight: string;
+  inStock: boolean;
+  stockQuantity: number;
+  compareAtPrice?: number;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  order: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  images: string[];
+  categoryId: string;
+  variants: ProductVariant[];
+  isFeatured: boolean;
+  isBestSeller: boolean;
+  isOnSale: boolean;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  category: Category;
 }

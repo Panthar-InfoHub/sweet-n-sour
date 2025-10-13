@@ -68,7 +68,7 @@ export function RecentOrders() {
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <span className="font-semibold">#{order.orderNumber}</span>
-                  <Badge variant={statusColors[order.status]} className="capitalize">
+                  <Badge variant={"default"} className="capitalize">
                     {order.status}
                   </Badge>
                 </div>

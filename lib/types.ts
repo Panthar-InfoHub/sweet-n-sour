@@ -1,38 +1,3 @@
-// Product Types
-export interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  price: number;
-  compareAtPrice?: number;
-  images: string[];
-  category: string;
-  categoryId: string;
-  weight: string[];
-  inStock: boolean;
-  stockQuantity: number;
-  rating: number;
-  reviewCount: number;
-  isFeatured: boolean;
-  isBestSeller: boolean;
-  isOnSale: boolean;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-// Category Types
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  image: string;
-  productCount: number;
-  order: number;
-  isActive: boolean;
-}
 
 // Cart Types
 export interface CartItem {
@@ -76,16 +41,6 @@ export interface Order {
   updatedAt: string;
 }
 
-// User Types
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  phone?: string;
-  role: "customer" | "admin";
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface Address {
   id: string;

@@ -16,45 +16,39 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white border-b border-border">
-        <nav className="container-custom py-4">
-          <div className="flex items-center justify-between gap-4">
+      <nav className="bg-brand-primary sticky top-0 z-50">
+        <div className="container-custom">
+          <div className="flex items-center justify-between gap-4 py-4">
             {/* Mobile Menu */}
             <Sheet>
               <SheetTrigger asChild className="lg:hidden">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left">
                 <div className="flex flex-col gap-4 mt-8">
                   <Link
-                    href="/"
-                    className="text-lg font-medium hover:text-primary transition-colors"
-                  >
-                    Home
-                  </Link>
-                  <Link
                     href="/products"
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="text-lg font-medium hover:text-brand-primary transition-colors"
                   >
                     Pickles
                   </Link>
                   <Link
                     href="/products?category=gift-combos"
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="text-lg font-medium hover:text-brand-primary transition-colors"
                   >
                     Gift & Combos
                   </Link>
                   <Link
                     href="/products?filter=special-offer"
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="text-lg font-medium hover:text-brand-primary transition-colors"
                   >
                     Special Offer
                   </Link>
                   <Link
                     href="/reviews"
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="text-lg font-medium hover:text-brand-primary transition-colors"
                   >
                     Customer Reviews
                   </Link>
@@ -63,82 +57,70 @@ export function Header() {
             </Sheet>
 
             {/* Logo */}
-            <Link href="/" className="text-2xl font-bold text-primary">
-              Pickle Paradise
+            <Link href="/" className="text-xl font-bold text-white">
+              Logo
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-8">
-              <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
-                Home
-              </Link>
+            <div className="hidden lg:flex items-center gap-8 flex-1 justify-center">
               <Link
                 href="/products"
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="text-sm font-medium text-white hover:text-white/80 transition-colors"
               >
                 Pickles
               </Link>
               <Link
                 href="/products?category=gift-combos"
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="text-sm font-medium text-white hover:text-white/80 transition-colors"
               >
                 Gift & Combos
               </Link>
               <Link
                 href="/products?filter=special-offer"
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="text-sm font-medium text-white hover:text-white/80 transition-colors"
               >
                 Special Offer
               </Link>
               <Link
                 href="/reviews"
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="text-sm font-medium text-white hover:text-white/80 transition-colors"
               >
                 Customer Reviews
               </Link>
             </div>
 
-            {/* Search Bar - Hidden on mobile */}
-            <div className="hidden md:flex flex-1 max-w-md">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
-                <Input type="search" placeholder="Search products..." className="pl-10" />
-              </div>
-            </div>
-
             {/* Actions */}
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="hidden md:flex">
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                 <Search className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="/wishlist">
-                  <Heart className="h-5 w-5" />
-                </Link>
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative"
+                className="relative text-white hover:bg-white/10"
                 onClick={() => setCartOpen(true)}
               >
                 <ShoppingCart className="h-5 w-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-white text-xs flex items-center justify-center font-semibold">
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-white text-brand-primary text-xs flex items-center justify-center font-semibold">
                     {cartCount}
                   </span>
                 )}
               </Button>
-              <Button variant="ghost" size="icon" asChild>
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" asChild>
+                <Link href="/wishlist">
+                  <Heart className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" asChild>
                 <Link href="/account">
                   <User className="h-5 w-5" />
                 </Link>
               </Button>
             </div>
           </div>
-        </nav>
-      </header>
-
+        </div>
+      </nav>
       {/* Cart Drawer */}
       <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
     </>

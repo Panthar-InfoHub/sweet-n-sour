@@ -1,7 +1,7 @@
-import Link from "next/link"
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function Footer() {
   return (
@@ -12,7 +12,8 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-primary">Pickle Paradise</h3>
             <p className="text-sm text-foreground-muted mb-4">
-              Crafting authentic, handmade pickles with traditional recipes passed down through generations.
+              Crafting authentic, handmade pickles with traditional recipes passed down through
+              generations.
             </p>
             <div className="flex gap-3">
               <Link
@@ -41,22 +42,34 @@ export function Footer() {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/about" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+                <Link
+                  href="/about"
+                  className="text-sm text-foreground-muted hover:text-primary transition-colors"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+                <Link
+                  href="/products"
+                  className="text-sm text-foreground-muted hover:text-primary transition-colors"
+                >
                   Shop
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+                <Link
+                  href="/blog"
+                  className="text-sm text-foreground-muted hover:text-primary transition-colors"
+                >
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+                <Link
+                  href="/contact"
+                  className="text-sm text-foreground-muted hover:text-primary transition-colors"
+                >
                   Contact
                 </Link>
               </li>
@@ -68,12 +81,18 @@ export function Footer() {
             <h3 className="text-lg font-semibold mb-4">Customer Service</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/shipping" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+                <Link
+                  href="/shipping"
+                  className="text-sm text-foreground-muted hover:text-primary transition-colors"
+                >
                   Shipping Policy
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+                <Link
+                  href="/returns"
+                  className="text-sm text-foreground-muted hover:text-primary transition-colors"
+                >
                   Returns & Refunds
                 </Link>
               </li>
@@ -115,24 +134,11 @@ export function Footer() {
             </ul>
           </div>
         </div>
-
-        {/* Newsletter */}
-        <div className="mt-12 pt-8 border-t border-border">
-          <div className="max-w-md mx-auto text-center">
-            <h3 className="text-lg font-semibold mb-2">Subscribe to Our Newsletter</h3>
-            <p className="text-sm text-foreground-muted mb-4">Get updates on new products and special offers</p>
-            <div className="flex gap-2">
-              <Input type="email" placeholder="Enter your email" className="flex-1" />
-              <Button className="bg-primary hover:bg-primary-hover">Subscribe</Button>
-            </div>
-          </div>
-        </div>
-
         {/* Copyright */}
         <div className="mt-8 pt-8 border-t border-border text-center text-sm text-foreground-muted">
           <p>&copy; {new Date().getFullYear()} Pickle Paradise. All rights reserved.</p>
         </div>
       </div>
     </footer>
-  )
+  );
 }
