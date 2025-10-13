@@ -78,7 +78,7 @@ export function MoodSection() {
                 <button
                   onMouseEnter={() => setHoveredBottle("left-1")}
                   onMouseLeave={() => setHoveredBottle(null)}
-                  className="absolute left-2 md:left-0 bottom-1/2 translate-y-1/2 cursor-pointer transition-transform duration-300 hover:scale-110 focus:outline-none"
+                  className="absolute left-2  md:left-0 bottom-1/2 translate-y-1/2 cursor-pointer transition-transform duration-300 hover:scale-110 focus:outline-none"
                 >
                   <Image
                     src="/images/dummy-2.png"
@@ -108,7 +108,7 @@ export function MoodSection() {
                 <button
                   onMouseEnter={() => setHoveredBottle("center-1")}
                   onMouseLeave={() => setHoveredBottle(null)}
-                  className="absolute right-1/2 -translate-x-1/2 top-4 md:top-4 cursor-pointer transition-transform duration-300 hover:scale-110 focus:outline-none"
+                  className="absolute right-1/2 -translate-x-1/2 top-6 md:top-8 cursor-pointer transition-transform duration-300 hover:scale-110 focus:outline-none"
                 >
                   <Image
                     src="/images/dummy-2.png"
@@ -123,7 +123,7 @@ export function MoodSection() {
                 <button
                   onMouseEnter={() => setHoveredBottle("center-2")}
                   onMouseLeave={() => setHoveredBottle(null)}
-                  className="absolute left-1/2 translate-x-1/2 top-4 md:top-4 cursor-pointer transition-transform duration-300 hover:scale-110 focus:outline-none"
+                  className="absolute left-1/2 translate-x-1/2 top-6 md:top-8 cursor-pointer transition-transform duration-300 hover:scale-110 focus:outline-none"
                 >
                   <Image
                     src="/images/dummy-2.png"
@@ -138,7 +138,7 @@ export function MoodSection() {
                 <button
                   onMouseEnter={() => setHoveredBottle("center-3")}
                   onMouseLeave={() => setHoveredBottle(null)}
-                  className="absolute right-1/2 translate-x-1/2 bottom-2 md:bottom-0 cursor-pointer transition-transform duration-300 hover:scale-110 focus:outline-none"
+                  className="absolute right-1/2 translate-x-1/2 bottom-6 md:bottom-2 cursor-pointer transition-transform duration-300 hover:scale-110 focus:outline-none"
                 >
                   <Image
                     src="/images/dummy-2.png"
