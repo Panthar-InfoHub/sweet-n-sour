@@ -2,6 +2,8 @@ import type React from "react";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { CartProvider } from "@/components/providers/cart-provider";
+import { WishlistSync } from "@/components/providers/wishlist-sync";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +35,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground" suppressHydrationWarning>
-        {children}
+        <CartProvider>
+          <WishlistSync />
+          {children}
+        </CartProvider>
         <Toaster />
       </body>
     </html>

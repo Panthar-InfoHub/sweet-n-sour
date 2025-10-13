@@ -2,7 +2,7 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/use-cart-db";
 import { CartItem } from "@/components/cart/cart-item";
 import { formatPrice } from "@/utils/format";
 import { ShoppingBag, X } from "lucide-react";

@@ -119,6 +119,8 @@ export function OrdersList() {
                           alt={item.name}
                           fill
                           className="object-contain p-2"
+                          loading="lazy"
+                          sizes="64px"
                         />
                       </div>
                       <div className="flex-1">
@@ -169,6 +171,8 @@ export function OrdersList() {
                                       alt={item.name}
                                       fill
                                       className="object-contain p-2"
+                                      loading="lazy"
+                                      sizes="64px"
                                     />
                                   </div>
                                   <div className="flex-1">

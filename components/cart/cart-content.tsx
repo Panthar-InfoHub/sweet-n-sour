@@ -1,7 +1,7 @@
 "use client";
 
-import { useCart } from "@/hooks/use-cart";
-import { CartItem } from "@/components/cart/cart-item";
+import { useCart } from "@/hooks/use-cart-db";
+import { CartItem } from "./cart-item";
 import { CartSummary } from "@/components/cart/cart-summary";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";

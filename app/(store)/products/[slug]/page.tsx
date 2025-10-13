@@ -14,9 +14,10 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const product = result.data;
 
   return (
-    <main className="min-h-screen py-8">
+    <main className=" py-8 bg-[url('/images/productpage-bg.svg')] bg-no-repeat bg-top bg-cover bg-fixed ">
       <ProductDetail product={product} />
       <RelatedProducts currentProductId={product.id} categoryId={product.categoryId} />
+      <div className="h-screen"></div>
     </main>
   );
 }

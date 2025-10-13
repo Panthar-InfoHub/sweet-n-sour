@@ -3,4 +3,6 @@
 - brand description 
 - quick links 
 - all policy pages
-- contact details page - liek address , email , phone number
+- contact details page - link address , email , phone number
+- make - shipping fees editable from the dashboard
+- make anouncemnt bar - editable form dashbaord

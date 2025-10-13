@@ -20,19 +20,20 @@ enum USER_ROLE {
 }
 
 model User {
-  id            String        @id
+  id            String         @id
   name          String
   email         String
-  emailVerified Boolean       @default(false)
+  emailVerified Boolean        @default(false)
   image         String?
-  role          USER_ROLE     @default(USER)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @default(now()) @updatedAt
+  role          USER_ROLE      @default(USER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
   orders        Order[]
   addresses     Address[]
   couponUsages  CouponUsage[]
+  wishlistItems WishlistItem[]
 
   @@unique([email])
   @@map("user")
@@ -101,21 +102,22 @@ model Category {
 }
 
 model Product {
-  id           String      @id @default(cuid())
-  name         String
-  slug         String      @unique
-  description  String
-  images       String[]    @default([])
-  categoryId   String
-  category     Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  variants     Json // Array of {weight, price, compareAtPrice, stockQuantity, inStock}
-  isFeatured   Boolean     @default(false)
-  isBestSeller Boolean     @default(false)
-  isOnSale     Boolean     @default(false)
-  tags         String[]    @default([])
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  orderItems   OrderItem[]
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  description   String
+  images        String[]       @default([])
+  categoryId    String
+  category      Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  variants      Json // Array of {weight, price, compareAtPrice, stockQuantity, inStock}
+  isFeatured    Boolean        @default(false)
+  isBestSeller  Boolean        @default(false)
+  isOnSale      Boolean        @default(false)
+  tags          String[]       @default([])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  orderItems    OrderItem[]
+  wishlistItems WishlistItem[]
 
   @@map("product")
 }
@@ -164,7 +166,6 @@ model Order {
   paymentCapturedAt DateTime?
   paymentMeta       Json?
 
-
   items OrderItem[]
 
   createdAt DateTime @default(now())
@@ -204,6 +205,43 @@ model Address {
   pinCode   String
 
   @@map("address")
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String?    @unique // null for guest carts
+  sessionId String?    @unique // for guest users
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("cart")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  weight    String // variant identifier
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId, weight])
+  @@map("cart_item")
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@map("wishlist_item")
 }
 
 enum CouponType {

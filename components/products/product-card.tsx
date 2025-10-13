@@ -6,20 +6,27 @@ import { Heart, ShoppingBag, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useCart } from "@/hooks/use-cart";
-import { CartItem } from "@/lib/types";
+import { useCart } from "@/hooks/use-cart-db";
+import { useWishlist } from "@/hooks/use-wishlist";
 import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
-  onToggleWishlist?: (productId: string) => void;
-  isInWishlist?: boolean;
 }
 
-export function ProductCard({ product, onToggleWishlist, isInWishlist = false }: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
-  const { addItem, items } = useCart();
+  const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
+  const { addItem, removeItem, items } = useCart();
+  const { toggleItem, isInWishlistLocal } = useWishlist();
   const selectedVariant = product.variants[selectedVariantIndex];
+  const isInWishlist = isInWishlistLocal(product.id);
+
+  // Check if this specific variant is in cart
+  const cartItem = items.find(
+    (i) => i.productId === product.id && i.weight === selectedVariant.weight
+  );
+  const isInCart = !!cartItem;
 
   // Calculate discount percentage
   const discountPercentage = selectedVariant.compareAtPrice
@@ -30,25 +37,32 @@ export function ProductCard({ product, onToggleWishlist, isInWishlist = false }:
       )
     : 0;
 
-  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCartAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    const item: Omit<CartItem, "id"> = {
-      productId: product.id,
-      name: product.name,
-      price: selectedVariant.price,
-      image: product.images[0] || "/placeholder.svg",
-      weight: selectedVariant.weight,
-      quantity: 1,
-    };
-    addItem(item);
-    toast.success("Added to cart", { duration: 1000 });
+
+    if (isInCart && cartItem) {
+      // Remove from cart
+      await removeItem(cartItem.id);
+    } else {
+      // Add to cart
+      await addItem(product.id, selectedVariant.weight, product.name, 1);
+    }
   };
 
-  const handleToggleWishlist = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleToggleWishlist = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    onToggleWishlist?.(product.id);
+
+    setIsTogglingWishlist(true);
+    const result = await toggleItem(product.id);
+    setIsTogglingWishlist(false);
+
+    if (result.success) {
+      toast.success(result.message);
+    } else {
+      toast.error(result.error || "Failed to update wishlist");
+    }
   };
 
   return (
@@ -70,6 +84,7 @@ export function ProductCard({ product, onToggleWishlist, isInWishlist = false }:
         onClick={handleToggleWishlist}
         size={"icon-sm"}
         variant="ghost"
+        disabled={isTogglingWishlist}
         className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition-all hover:scale-110 hover:shadow-lg "
         aria-label="Add to wishlist"
       >
@@ -83,7 +98,14 @@ export function ProductCard({ product, onToggleWishlist, isInWishlist = false }:
 
       {/* Product Image */}
       <div className="relative aspect-square w-full overflow-hidden  p-8">
-        <Image src={"/images/dummy-2.png"} alt={product.name} fill className="object-contain" />
+        <Image
+          src={product.images[0] || "/placeholder.svg"}
+          alt={product.name}
+          fill
+          className="object-contain"
+          loading="lazy"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
       </div>
 
       {/* Product Details */}
@@ -138,20 +160,13 @@ export function ProductCard({ product, onToggleWishlist, isInWishlist = false }:
           </div>
 
           <Button
-            onClick={handleAddToCart}
-            // size={"sm"}
-            disabled={
-              !selectedVariant.inStock ||
-              items.find((i) => i.id.startsWith(`${product.id}-${selectedVariant.weight}`))
-                ? true
-                : false
-            }
+            onClick={handleCartAction}
+            disabled={!selectedVariant.inStock}
+            variant={isInCart ? "outline" : "default"}
             className="rounded-full"
           >
             <ShoppingBag className="h-5 w-5" />
-            {items.find((i) => i.id.startsWith(`${product.id}-${selectedVariant.weight}`))
-              ? "Added"
-              : "Add"}
+            {isInCart ? "Remove" : "Add"}
           </Button>
         </div>
 

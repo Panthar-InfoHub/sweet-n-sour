@@ -1,15 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Star, Heart, Share2, ShoppingCart, Minus, Plus } from "lucide-react";
+import {
+  Star,
+  Heart,
+  Share2,
+  ShoppingCart,
+  Minus,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { formatPrice, calculateDiscount } from "@/utils/format";
-import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/use-cart-db";
+import { useWishlist } from "@/hooks/use-wishlist";
 import { toast } from "sonner";
+
+// Utility function to check if URL is a video
+const isVideoUrl = (url: string): boolean => {
+  if (!url) return false;
+  const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
+  const lowerUrl = url.toLowerCase();
+  return videoExtensions.some((ext) => lowerUrl.includes(ext)) || lowerUrl.includes("video");
+};
 
 interface Variant {
   weight: string;
@@ -46,31 +64,50 @@ interface ProductDetailProps {
 
 export function ProductDetail({ product }: ProductDetailProps) {
   const { addItem } = useCart();
+  const { toggleItem, isInWishlistLocal } = useWishlist();
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
 
   const selectedVariant = product.variants[selectedVariantIndex];
+  const isInWishlist = isInWishlistLocal(product.id);
   const discount = selectedVariant.compareAtPrice
     ? calculateDiscount(selectedVariant.price, selectedVariant.compareAtPrice)
     : 0;
 
-  const handleAddToCart = () => {
+  // Keyboard navigation for images
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        setSelectedImage((prev) => Math.max(0, prev - 1));
+      } else if (e.key === "ArrowRight") {
+        setSelectedImage((prev) => Math.min(product.images.length - 1, prev + 1));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [product.images.length]);
+
+  const handleAddToCart = async () => {
     if (!selectedVariant.inStock) {
-      toast.error("This product is out of stock");
       return;
     }
 
-    addItem({
-      productId: product.id,
-      name: product.name,
-      price: selectedVariant.price,
-      image: product.images[0] || "/placeholder.svg",
-      weight: selectedVariant.weight,
-      quantity: quantity,
-    });
+    await addItem(product.id, selectedVariant.weight, product.name, quantity);
+  };
 
-    toast.success(`${product.name} (${selectedVariant.weight}) × ${quantity} added to cart!`);
+  const handleToggleWishlist = async () => {
+    setIsTogglingWishlist(true);
+    const result = await toggleItem(product.id);
+    setIsTogglingWishlist(false);
+
+    if (result.success) {
+      toast.success(result.message);
+    } else {
+      toast.error(result.error || "Failed to update wishlist");
+    }
   };
 
   return (
@@ -78,15 +115,29 @@ export function ProductDetail({ product }: ProductDetailProps) {
       <div className="grid lg:grid-cols-2 gap-12">
         {/* Product Images */}
         <div>
-          {/* Main Image */}
+          {/* Main Image/Video */}
           <div className="relative aspect-square bg-surface rounded-lg mb-4 overflow-hidden">
-            <Image
-              src={product.images[selectedImage] || "/placeholder.svg"}
-              alt={product.name}
-              fill
-              className="object-contain p-8"
-              priority
-            />
+            {isVideoUrl(product.images[selectedImage]) ? (
+              <video
+                src={product.images[selectedImage]}
+                className="w-full h-full object-contain p-8"
+                controls
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+            ) : (
+              <Image
+                src={product.images[selectedImage] || "/placeholder.svg"}
+                alt={product.name}
+                fill
+                className="object-contain p-8"
+                priority={selectedImage === 0}
+                loading={selectedImage === 0 ? "eager" : "lazy"}
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            )}
             {product.isOnSale && discount > 0 && (
               <Badge variant="destructive" className="absolute top-4 left-4">
                 {discount}% OFF
@@ -94,8 +145,35 @@ export function ProductDetail({ product }: ProductDetailProps) {
             )}
           </div>
 
+          {/* Navigation Arrows */}
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setSelectedImage(Math.max(0, selectedImage - 1))}
+              disabled={selectedImage === 0}
+              className="h-8 w-8"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              {selectedImage + 1} / {product.images.length}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                setSelectedImage(Math.min(product.images.length - 1, selectedImage + 1))
+              }
+              disabled={selectedImage === product.images.length - 1}
+              className="h-8 w-8"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
           {/* Thumbnail Images */}
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-5 gap-2">
             {product.images.map((image, index) => (
               <button
                 key={index}
@@ -106,19 +184,25 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     : "border-transparent hover:border-border"
                 }`}
               >
-                <Image
-                  src={image || "/placeholder.svg"}
-                  alt={`${product.name} ${index + 1}`}
-                  fill
-                  className="object-contain p-2"
-                />
+                {isVideoUrl(image) ? (
+                  <video src={image} className="w-full h-full object-cover p-1" muted />
+                ) : (
+                  <Image
+                    src={image || "/placeholder.svg"}
+                    alt={`${product.name} ${index + 1}`}
+                    fill
+                    className="object-contain p-1"
+                    loading="lazy"
+                    sizes="80px"
+                  />
+                )}
               </button>
             ))}
             {/* Gift Pack Option */}
             <button className="relative aspect-square bg-surface rounded-lg overflow-hidden border-2 border-transparent hover:border-border flex items-center justify-center">
-              <div className="text-center p-2">
-                <div className="text-2xl mb-1">🎁</div>
-                <span className="text-xs font-medium">Want to pack as a gift?</span>
+              <div className="text-center p-1">
+                <div className="text-xl mb-0.5">🎁</div>
+                <span className="text-[10px] font-medium leading-tight">Gift?</span>
               </div>
             </button>
           </div>
@@ -214,8 +298,17 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <ShoppingCart className="h-5 w-5 mr-2" />
               {selectedVariant.inStock ? "Add to Cart" : "Out of Stock"}
             </Button>
-            <Button size="lg" variant="outline">
-              <Heart className="h-5 w-5" />
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={handleToggleWishlist}
+              disabled={isTogglingWishlist}
+            >
+              <Heart
+                className={`h-5 w-5 transition-colors ${
+                  isInWishlist ? "fill-red-500 text-red-500" : ""
+                }`}
+              />
             </Button>
             <Button size="lg" variant="outline">
               <Share2 className="h-5 w-5" />

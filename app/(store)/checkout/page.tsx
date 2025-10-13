@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/use-cart-db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -443,6 +443,8 @@ export default function CheckoutPage() {
                           alt={item.name}
                           fill
                           className="object-cover"
+                          loading="lazy"
+                          sizes="64px"
                         />
                       </div>
                       <div className="flex-1 min-w-0">

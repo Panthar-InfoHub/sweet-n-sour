@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/use-cart-db";
 import { formatPrice } from "@/utils/format";
 import { FREE_SHIPPING_THRESHOLD } from "@/utils/constants";
 import { Truck } from "lucide-react";

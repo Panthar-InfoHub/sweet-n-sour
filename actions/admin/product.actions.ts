@@ -4,6 +4,7 @@ import { ProductFormData, productSchema } from "@/lib/zod-schema";
 import { prisma } from "@/prisma/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { transformProductsWithSignedUrls, transformProductWithSignedUrls } from "@/lib/image-utils";
 
 // Get all products with filtering
 export async function getProducts(filters?: {
@@ -47,7 +48,10 @@ export async function getProducts(filters?: {
       orderBy: { createdAt: "desc" },
     });
 
-    return { success: true, data: products };
+    // Transform images to signed URLs
+    const productsWithSignedUrls = await transformProductsWithSignedUrls(products);
+
+    return { success: true, data: productsWithSignedUrls };
   } catch (error) {
     console.error("Error fetching products:", error);
     return { success: false, error: "Failed to fetch products" };
@@ -68,7 +72,10 @@ export async function getProduct(id: string) {
       return { success: false, error: "Product not found" };
     }
 
-    return { success: true, data: product };
+    // Transform images to signed URLs
+    const productWithSignedUrls = await transformProductWithSignedUrls(product);
+
+    return { success: true, data: productWithSignedUrls };
   } catch (error) {
     console.error("Error fetching product:", error);
     return { success: false, error: "Failed to fetch product" };
@@ -89,7 +96,10 @@ export async function getProductBySlug(slug: string) {
       return { success: false, error: "Product not found" };
     }
 
-    return { success: true, data: product };
+    // Transform images to signed URLs
+    const productWithSignedUrls = await transformProductWithSignedUrls(product);
+
+    return { success: true, data: productWithSignedUrls };
   } catch (error) {
     console.error("Error fetching product:", error);
     return { success: false, error: "Failed to fetch product" };

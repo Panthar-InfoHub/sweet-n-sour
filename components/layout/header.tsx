@@ -7,12 +7,15 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartDrawer } from "@/components/cart/cart-drawer";
-import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/use-cart-db";
+import { useWishlist } from "@/hooks/use-wishlist";
 
 export function Header() {
   const [cartOpen, setCartOpen] = useState(false);
   const { items } = useCart();
+  const { items: wishlistItems } = useWishlist();
   const cartCount = items.length;
+  const wishlistCount = wishlistItems.length;
 
   return (
     <>
@@ -107,9 +110,19 @@ export function Header() {
                   </span>
                 )}
               </Button>
-              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" asChild>
-                <Link href="/wishlist">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-white hover:bg-white/10"
+                asChild
+              >
+                <Link href="/account/wishlist">
                   <Heart className="h-5 w-5" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-white text-brand-primary text-xs flex items-center justify-center font-semibold">
+                      {wishlistCount}
+                    </span>
+                  )}
                 </Link>
               </Button>
               <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" asChild>

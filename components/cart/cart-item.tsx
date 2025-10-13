@@ -4,9 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { CartItem as CartItemType } from "@/lib/types";
+import type { CartItem as CartItemType } from "@/hooks/use-cart-db";
 import { formatPrice } from "@/utils/format";
-import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/use-cart-db";
 
 interface CartItemProps {
   item: CartItemType;
@@ -18,20 +18,22 @@ export function CartItem({ item }: CartItemProps) {
   return (
     <div className="bg-white rounded-lg border border-border p-4 flex gap-4">
       {/* Product Image */}
-      <Link href={`/products/${item.productId}`} className="flex-shrink-0">
+      <Link href={`/products/${item.slug}`} className="flex-shrink-0">
         <div className="relative w-24 h-24 bg-surface rounded-lg overflow-hidden">
           <Image
             src={item.image || "/placeholder.svg"}
             alt={item.name}
             fill
             className="object-contain p-2"
+            loading="lazy"
+            sizes="96px"
           />
         </div>
       </Link>
 
       {/* Product Info */}
       <div className="flex-1 min-w-0">
-        <Link href={`/products/${item.productId}`}>
+        <Link href={`/products/${item.slug}`}>
           <h3 className="font-semibold text-foreground hover:text-primary transition-colors line-clamp-2 mb-1">
             {item.name}
           </h3>

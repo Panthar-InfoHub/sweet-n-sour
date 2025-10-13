@@ -4,6 +4,7 @@ import { CategoryFormData, categorySchema } from "@/lib/zod-schema";
 import { prisma } from "@/prisma/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getCachedSignedUrl } from "@/lib/image-utils";
 
 // Validation Schema
 
@@ -19,12 +20,21 @@ export async function getCategories() {
       orderBy: { order: "asc" },
     });
 
+    // Transform category images to signed URLs
+    const categoriesWithSignedUrls = await Promise.all(
+      categories.map(async (cat) => {
+        const signedImage = cat.image ? await getCachedSignedUrl(cat.image) : cat.image;
+        return {
+          ...cat,
+          image: signedImage,
+          productCount: cat._count.products,
+        };
+      })
+    );
+
     return {
       success: true,
-      data: categories.map((cat) => ({
-        ...cat,
-        productCount: cat._count.products,
-      })),
+      data: categoriesWithSignedUrls,
     };
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -48,10 +58,14 @@ export async function getCategory(id: string) {
       return { success: false, error: "Category not found" };
     }
 
+    // Transform category image to signed URL
+    const signedImage = category.image ? await getCachedSignedUrl(category.image) : category.image;
+
     return {
       success: true,
       data: {
         ...category,
+        image: signedImage,
         productCount: category._count.products,
       },
     };
@@ -77,10 +91,14 @@ export async function getCategoryBySlug(slug: string) {
       return { success: false, error: "Category not found" };
     }
 
+    // Transform category image to signed URL
+    const signedImage = category.image ? await getCachedSignedUrl(category.image) : category.image;
+
     return {
       success: true,
       data: {
         ...category,
+        image: signedImage,
         productCount: category._count.products,
       },
     };
