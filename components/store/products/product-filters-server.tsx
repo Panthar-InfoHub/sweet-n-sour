@@ -97,15 +97,15 @@ export function ProductFilters({ categorySlug, categories = [] }: ProductFilters
     minRating || availability !== "all" || selectedCategories.length > 0 || searchQuery;
 
   return (
-    <div className="bg-white rounded-xl border border-border p-6 sticky top-24 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="bg-white lg:rounded-xl lg:border lg:border-border p-4 lg:sticky lg:top-24 space-y-4">
+      <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-semibold">Filters</h2>
         {hasActiveFilters && (
           <Button
             variant="ghost"
             size="sm"
             onClick={clearAllFilters}
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className="text-sm text-muted-foreground hover:text-foreground h-8 px-2"
           >
             <X className="h-4 w-4 mr-1" />
             Clear
@@ -114,18 +114,25 @@ export function ProductFilters({ categorySlug, categories = [] }: ProductFilters
       </div>
 
       {/* Search Input */}
-      <div className="space-y-2">
-        <Label className="text-sm font-medium">Search Products</Label>
+      <div className="space-y-2 pb-3 border-b">
+        <Label className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">
+          Search Products
+        </Label>
         <div className="flex gap-2">
           <Input
             type="text"
-            placeholder="Search by name, description..."
+            placeholder="Search by name..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={handleSearchKeyDown}
-            className="flex-1"
+            className="flex-1 h-9 text-sm"
           />
-          <Button onClick={handleSearch} size="icon" variant="default">
+          <Button
+            onClick={handleSearch}
+            size="icon"
+            variant="default"
+            className="h-9 w-9 flex-shrink-0"
+          >
             <Search className="h-4 w-4" />
           </Button>
         </div>
@@ -133,51 +140,56 @@ export function ProductFilters({ categorySlug, categories = [] }: ProductFilters
 
       {/* Categories - Only show on /products page */}
       {!categorySlug && categories.length > 0 && (
-        <Collapsible open={isCategoryOpen} onOpenChange={setIsCategoryOpen}>
-          <CollapsibleTrigger className="w-full">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium text-sm">Categories</h3>
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${isCategoryOpen ? "rotate-180" : ""}`}
-              />
-            </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3">
-            <div className="space-y-2 max-h-[300px] overflow-y-auto">
-              {categories.map((category) => (
-                <div key={category.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`category-${category.slug}`}
-                    checked={selectedCategories.includes(category.slug)}
-                    onCheckedChange={(checked) => {
-                      updateCategoryFilter(category.slug, !!checked);
-                    }}
-                  />
-                  <Label
-                    htmlFor={`category-${category.slug}`}
-                    className="text-sm cursor-pointer flex-1 flex items-center justify-between"
-                  >
-                    <span className="capitalize">{category.name}</span>
-                    {category.productCount !== undefined && (
-                      <span className="text-xs text-muted-foreground">
-                        ({category.productCount})
-                      </span>
-                    )}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+        <div className="pb-3 border-b">
+          <Collapsible open={isCategoryOpen} onOpenChange={setIsCategoryOpen}>
+            <CollapsibleTrigger className="w-full">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-xs uppercase text-muted-foreground tracking-wider">
+                  Categories
+                </h3>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${isCategoryOpen ? "rotate-180" : ""}`}
+                />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-1">
+              <div className="space-y-2.5 max-h-[200px] overflow-y-auto">
+                {categories.map((category) => (
+                  <div key={category.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`category-${category.slug}`}
+                      checked={selectedCategories.includes(category.slug)}
+                      onCheckedChange={(checked) => {
+                        updateCategoryFilter(category.slug, !!checked);
+                      }}
+                    />
+                    <Label
+                      htmlFor={`category-${category.slug}`}
+                      className="text-sm cursor-pointer flex-1 flex items-center justify-between"
+                    >
+                      <span className="capitalize">{category.name}</span>
+                      {category.productCount !== undefined && (
+                        <span className="text-xs text-muted-foreground">
+                          ({category.productCount})
+                        </span>
+                      )}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
       )}
 
       {/* Rating */}
-      <div>
-        <h3 className="font-medium mb-3 text-sm">Rating</h3>
+      <div className="pb-3 border-b">
+        <h3 className="font-semibold text-xs uppercase text-muted-foreground tracking-wider mb-3">
+          Rating
+        </h3>
         <RadioGroup
           value={minRating}
           onValueChange={(value) => {
-            // If clicking the same rating, deselect it
             if (value === minRating) {
               updateFilter("minRating", null);
             } else {
@@ -185,42 +197,37 @@ export function ProductFilters({ categorySlug, categories = [] }: ProductFilters
             }
           }}
         >
-          {[5, 4, 3, 2, 1].map((rating) => (
-            <div
-              key={rating}
-              className="flex items-center space-x-2"
-              onClick={() => {
-                // Allow deselecting by clicking the same rating
-                if (minRating === rating.toString()) {
-                  updateFilter("minRating", null);
-                }
-              }}
-            >
-              <RadioGroupItem value={rating.toString()} id={`rating-${rating}`} />
-              <Label
-                htmlFor={`rating-${rating}`}
-                className="flex items-center gap-1 cursor-pointer text-sm"
-              >
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-3.5 w-3.5 ${
-                        i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-muted-foreground">& Up</span>
-              </Label>
-            </div>
-          ))}
+          <div className="space-y-2.5">
+            {[5, 4, 3, 2, 1].map((rating) => (
+              <div key={rating} className="flex items-center space-x-2">
+                <RadioGroupItem value={rating.toString()} id={`rating-${rating}`} />
+                <Label
+                  htmlFor={`rating-${rating}`}
+                  className="flex items-center gap-1 cursor-pointer text-sm"
+                >
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-3.5 w-3.5 ${
+                          i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-muted-foreground text-xs">& Up</span>
+                </Label>
+              </div>
+            ))}
+          </div>
         </RadioGroup>
       </div>
 
       {/* Availability */}
       <div>
-        <h3 className="font-medium mb-3 text-sm">Availability</h3>
+        <h3 className="font-semibold text-xs uppercase text-muted-foreground tracking-wider mb-3">
+          Availability
+        </h3>
         <RadioGroup
           value={availability}
           onValueChange={(value) => {
@@ -231,23 +238,25 @@ export function ProductFilters({ categorySlug, categories = [] }: ProductFilters
             }
           }}
         >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="all" id="availability-all" />
-            <Label htmlFor="availability-all" className="text-sm cursor-pointer">
-              All Products
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="in-stock" id="availability-in-stock" />
-            <Label htmlFor="availability-in-stock" className="text-sm cursor-pointer">
-              In Stock Only
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="out-of-stock" id="availability-out-of-stock" />
-            <Label htmlFor="availability-out-of-stock" className="text-sm cursor-pointer">
-              Out of Stock
-            </Label>
+          <div className="space-y-2.5">
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="all" id="availability-all" />
+              <Label htmlFor="availability-all" className="text-sm cursor-pointer">
+                All Products
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="in-stock" id="availability-in-stock" />
+              <Label htmlFor="availability-in-stock" className="text-sm cursor-pointer">
+                In Stock Only
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="out-of-stock" id="availability-out-of-stock" />
+              <Label htmlFor="availability-out-of-stock" className="text-sm cursor-pointer">
+                Out of Stock
+              </Label>
+            </div>
           </div>
         </RadioGroup>
       </div>

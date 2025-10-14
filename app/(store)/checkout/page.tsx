@@ -598,30 +598,30 @@ export default function CheckoutPage() {
             </div>
 
             {/* Right Column - Order Summary */}
-            <div className="lg:sticky lg:top-8 h-full space-y-6 ">
-              <Card className="p-6 space-y-2 ">
+            <div className="lg:sticky lg:top-8 h-full space-y-6">
+              <Card className="p-4 sm:p-6 space-y-2">
                 {/* Cart Items */}
-                <div className="space-y-2">
+                <div className="space-y-2 max-h-[300px] sm:max-h-none overflow-y-auto">
                   {items.map((item) => (
-                    <div key={item.id} className="flex gap-4">
-                      <div className="relative w-16 h-16 rounded-lg border overflow-hidden bg-muted flex-shrink-0">
+                    <div key={item.id} className="flex gap-2 sm:gap-4">
+                      <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg border overflow-hidden bg-muted flex-shrink-0">
                         <Image
                           src={item.image || "/placeholder.svg"}
                           alt={item.name}
                           fill
                           className="object-cover"
                           loading="lazy"
-                          sizes="64px"
+                          sizes="(max-width: 640px) 48px, 64px"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">{item.name}</h4>
-                        <div className="flex gap-4">
-                          <p className="text-xs text-muted-foreground ">{item.weight}</p>
-                          <p className="text-xs text-muted-foreground ">Qty: {item.quantity}</p>
+                        <h4 className="font-medium text-xs sm:text-sm truncate">{item.name}</h4>
+                        <div className="flex gap-2 sm:gap-4">
+                          <p className="text-xs text-muted-foreground">{item.weight}</p>
+                          <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                         </div>
                       </div>
-                      <div className="text-sm font-semibold">
+                      <div className="text-xs sm:text-sm font-semibold flex-shrink-0">
                         {formatPrice(item.price * item.quantity)}
                       </div>
                     </div>

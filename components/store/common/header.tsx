@@ -67,6 +67,31 @@ export function Header() {
               {/* Search - Desktop and Mobile */}
               <SearchDialog />
 
+              {/* Mobile Visible Icons - Cart & Account */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden relative text-white hover:bg-white/10"
+                onClick={() => setCartOpen(true)}
+              >
+                <ShoppingCart className="h-5 w-5 text-white" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-white text-brand-primary text-xs flex items-center justify-center font-semibold">
+                    {cartCount}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden text-white hover:bg-white/10"
+                asChild
+              >
+                <Link href="/account">
+                  <User className="h-5 w-5 text-white" />
+                </Link>
+              </Button>
+
               {/* Desktop Actions */}
               <div className="hidden lg:flex items-center gap-2">
                 <Button
@@ -116,14 +141,14 @@ export function Header() {
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                  <div className="flex flex-col gap-6 mt-8">
+                <SheetContent side="right" className="w-[280px] p-0 bg-brand-background">
+                  <div className="flex flex-col h-full py-6">
                     {/* User Actions */}
-                    <div className="flex flex-col gap-3 pb-6 border-b">
-                      <h3 className="font-semibold text-sm text-muted-foreground uppercase">
+                    <div className="flex flex-col px-4 pb-4 border-b">
+                      <h3 className="font-semibold text-xs text-muted-foreground uppercase mb-3 tracking-wider">
                         Account
                       </h3>
-                      <Button variant="ghost" className="justify-start gap-3 h-12" asChild>
+                      <Button variant="ghost" className="justify-start gap-3 h-10 px-2" asChild>
                         <Link href="/account">
                           <User className="h-5 w-5" />
                           <span>My Account</span>
@@ -131,57 +156,50 @@ export function Header() {
                       </Button>
                       <Button
                         variant="ghost"
-                        className="justify-start gap-3 h-12 relative"
-                        onClick={() => setCartOpen(true)}
+                        className="justify-start gap-3 h-10 px-2 relative"
+                        asChild
                       >
-                        <ShoppingCart className="h-5 w-5" />
-                        <span>Cart</span>
-                        {cartCount > 0 && (
-                          <span className="ml-auto h-6 w-6 rounded-full bg-brand-primary text-white text-xs flex items-center justify-center font-semibold">
-                            {cartCount}
-                          </span>
-                        )}
-                      </Button>
-                      <Button variant="ghost" className="justify-start gap-3 h-12 relative" asChild>
                         <Link href="/account/wishlist">
                           <Heart className="h-5 w-5" />
                           <span>Wishlist</span>
                           {wishlistCount > 0 && (
-                            <span className="ml-auto h-6 w-6 rounded-full bg-brand-primary text-white text-xs flex items-center justify-center font-semibold">
+                            <span className="ml-auto h-5 w-5 rounded-full bg-brand-primary text-white text-xs flex items-center justify-center font-semibold">
                               {wishlistCount}
                             </span>
                           )}
                         </Link>
                       </Button>
-                      <AdminPanelLink variant="full" />
+                      <div className="px-2">
+                        <AdminPanelLink variant="full" />
+                      </div>
                     </div>
 
                     {/* Navigation Links */}
-                    <div className="flex flex-col gap-3">
-                      <h3 className="font-semibold text-sm text-muted-foreground uppercase">
+                    <div className="flex flex-col px-4 pt-4">
+                      <h3 className="font-semibold text-xs text-muted-foreground uppercase mb-3 tracking-wider">
                         Shop
                       </h3>
                       <Link
                         href="/products"
-                        className="text-base font-medium hover:text-brand-primary transition-colors py-2"
+                        className="text-sm font-medium hover:text-brand-primary transition-colors py-2.5 px-2 rounded-md hover:bg-white/50"
                       >
                         Pickles
                       </Link>
                       <Link
                         href="/products?category=gift-combos"
-                        className="text-base font-medium hover:text-brand-primary transition-colors py-2"
+                        className="text-sm font-medium hover:text-brand-primary transition-colors py-2.5 px-2 rounded-md hover:bg-white/50"
                       >
                         Gift & Combos
                       </Link>
                       <Link
                         href="/products?filter=special-offer"
-                        className="text-base font-medium hover:text-brand-primary transition-colors py-2"
+                        className="text-sm font-medium hover:text-brand-primary transition-colors py-2.5 px-2 rounded-md hover:bg-white/50"
                       >
                         Special Offer
                       </Link>
                       <Link
                         href="/reviews"
-                        className="text-base font-medium hover:text-brand-primary transition-colors py-2"
+                        className="text-sm font-medium hover:text-brand-primary transition-colors py-2.5 px-2 rounded-md hover:bg-white/50"
                       >
                         Customer Reviews
                       </Link>

@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
 import { Empty } from "@/components/ui/empty";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ProductFilters } from "@/components/store/products/product-filters-server";
 
 interface ProductsGridProps {
   products: any[];
@@ -21,9 +23,16 @@ interface ProductsGridProps {
     totalProducts: number;
     totalPages: number;
   };
+  categories?: any[];
+  categorySlug?: string;
 }
 
-export function ProductsGrid({ products, pagination }: ProductsGridProps) {
+export function ProductsGrid({
+  products,
+  pagination,
+  categories,
+  categorySlug,
+}: ProductsGridProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSort = searchParams.get("sortBy") || "featured";
@@ -44,8 +53,8 @@ export function ProductsGrid({ products, pagination }: ProductsGridProps) {
   return (
     <div>
       {/* Toolbar */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-        <p className="text-sm text-muted-foreground">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border gap-2">
+        <p className="text-sm text-muted-foreground hidden sm:block">
           Showing{" "}
           <span className="font-medium text-foreground">
             {pagination
@@ -62,10 +71,27 @@ export function ProductsGrid({ products, pagination }: ProductsGridProps) {
           products
         </p>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-1 sm:flex-initial justify-end">
+          {/* Mobile Filter Button */}
+          {categories && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="lg:hidden h-10 w-10">
+                  <SlidersHorizontal className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="left"
+                className="w-[280px] p-4 bg-brand-background overflow-y-auto"
+              >
+                <ProductFilters categories={categories} categorySlug={categorySlug} />
+              </SheetContent>
+            </Sheet>
+          )}
+
           {/* Sort */}
           <Select value={currentSort} onValueChange={handleSortChange}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[140px] sm:w-[180px] h-10">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -90,7 +116,7 @@ export function ProductsGrid({ products, pagination }: ProductsGridProps) {
           </div>
         </Empty>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

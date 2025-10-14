@@ -68,12 +68,12 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/products/${product.slug}`}
-      className="group relative w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-md transition-shadow hover:shadow-lg"
+      className="group relative w-full overflow-hidden rounded-xl sm:rounded-2xl bg-white shadow-md transition-shadow hover:shadow-lg"
     >
       {/* Discount Badge */}
       {discountPercentage > 0 && product.isOnSale && (
-        <div className="absolute left-0 top-0 h-24 w-24 z-10">
-          <div className="absolute shadow-md transform -rotate-45 bg-brand-primary-2 text-center text-white font-semibold py-1 right-[-35px] top-[32px] w-[170px]">
+        <div className="absolute left-0 top-0 h-20 w-20 sm:h-24 sm:w-24 z-10">
+          <div className="absolute shadow-md transform -rotate-45 bg-brand-primary-2 text-center text-white font-semibold py-0.5 sm:py-1 right-[-30px] sm:right-[-35px] top-[25px] sm:top-[32px] w-[140px] sm:w-[170px] text-xs sm:text-sm">
             {discountPercentage}% OFF
           </div>
         </div>
@@ -85,77 +85,62 @@ export function ProductCard({ product }: ProductCardProps) {
         size={"icon-sm"}
         variant="ghost"
         disabled={isTogglingWishlist}
-        className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition-all hover:scale-110 hover:shadow-lg "
+        className="absolute right-2 sm:right-4 top-2 sm:top-4 z-10 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-white shadow-md transition-all hover:scale-110 hover:shadow-lg"
         aria-label="Add to wishlist"
       >
         <Heart
           className={cn(
-            "h-5 w-5 transition-colors",
+            "h-4 w-4 sm:h-5 sm:w-5 transition-colors",
             isInWishlist ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-500"
           )}
         />
       </Button>
 
       {/* Product Image */}
-      <div className="relative aspect-video h-48 w-full overflow-hidden  p-8">
+      <div className="relative aspect-video h-32 sm:h-48 w-full overflow-hidden p-4 sm:p-8">
         <Image
           src={product.images[0] || "/placeholder.svg"}
           alt={product.name}
           fill
-          className="object-contain "
+          className="object-contain"
           loading="lazy"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          sizes="(max-width: 640px) 50vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
 
       {/* Product Details */}
-      <div className="  p-3">
+      <div className="p-2 sm:p-3">
         {/* Category and Rating */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm  capitalize text-muted-foreground">{product.category.name}</span>
-          <div className="flex items-center gap-1">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-medium">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs sm:text-sm capitalize text-muted-foreground truncate flex-1">
+            {product.category.name}
+          </span>
+          <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+            <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400" />
+            <span className="text-xs sm:text-sm font-medium">
               {product.averageRating ? product.averageRating.toFixed(1) : "0.0"}
             </span>
           </div>
         </div>
 
         {/* Product Name */}
-        <h3 className="text-xl font-bold capitalize">{product.name}</h3>
+        <h3 className="text-sm sm:text-xl font-bold capitalize line-clamp-2 mb-1">
+          {product.name}
+        </h3>
 
-        {/* Variant Selector */}
-        {product.variants.length > 1 && (
-          <p className="text-sm font-semibold text-muted-foreground">
-            {product.variants[selectedVariantIndex].weight}
-          </p>
-          // <div className="flex flex-wrap gap-2 ">
-          //   {product.variants.map((variant, index) => (
-          //     // <Button
-
-          //       key={index}
-          //       size={"sm"}
-          //       variant={"outline"}
-          //       onClick={() => setSelectedVariantIndex(index)}
-          //       className={""}
-          //     >
-          //       {variant.weight}
-          //     </Button>
-          //   ))}
-          // </div>
-        )}
-
-        {/* Single Variant Display */}
-        {product.variants.length === 1 && (
-          <p className="text-sm font-semibold text-muted-foreground">{selectedVariant.weight}</p>
-        )}
+        {/* Variant Display */}
+        <p className="text-xs sm:text-sm font-semibold text-muted-foreground mb-1">
+          {selectedVariant.weight}
+        </p>
 
         {/* Price and Add to Cart */}
-        <div className="flex items-center justify-between gap-4 pt-2">
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-gray-900">₹{selectedVariant.price}</span>
+        <div className="flex items-center justify-between gap-2 pt-1">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <span className="text-base sm:text-lg font-bold text-gray-900">
+              ₹{selectedVariant.price}
+            </span>
             {selectedVariant.compareAtPrice && (
-              <span className="text-lg text-gray-400 line-through">
+              <span className="text-sm sm:text-lg text-gray-400 line-through">
                 ₹{selectedVariant.compareAtPrice}
               </span>
             )}
@@ -165,16 +150,17 @@ export function ProductCard({ product }: ProductCardProps) {
             onClick={handleCartAction}
             disabled={!selectedVariant.inStock}
             variant={isInCart ? "outline" : "default"}
-            className="rounded-full"
+            size="sm"
+            className="rounded-full h-8 sm:h-10 px-3 sm:px-4"
           >
-            <ShoppingBag className="h-5 w-5" />
-            {isInCart ? "Remove" : "Add"}
+            <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 sm:mr-1" />
+            <span className="hidden sm:inline">{isInCart ? "Remove" : "Add"}</span>
           </Button>
         </div>
 
         {/* Stock Status */}
         {!selectedVariant.inStock && (
-          <p className="text-sm font-medium text-red-500">Out of Stock</p>
+          <p className="text-xs sm:text-sm font-medium text-red-500 mt-1">Out of Stock</p>
         )}
       </div>
     </Link>
