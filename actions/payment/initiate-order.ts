@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { prisma } from "@/prisma/db";
 import Razorpay from "razorpay";
 import { OrderDetails, orderDetailsSchema } from "@/lib/zod-schema";
-import { SHIPPING_COST, FREE_SHIPPING_THRESHOLD } from "@/utils/constants";
+import { calculateShippingCharge } from "@/actions/admin/site-config.actions";
 import { generateOrderNumber } from "@/utils/order-helpers";
 
 export async function initiateOrder(orderDetails: OrderDetails) {
@@ -87,7 +87,11 @@ export async function initiateOrder(orderDetails: OrderDetails) {
   }
 
   const discountedSubtotal = subtotal - discount;
-  const shippingFee = discountedSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+
+  // Calculate shipping based on site config
+  const shippingResult = await calculateShippingCharge(discountedSubtotal);
+  const shippingFee = shippingResult.success ? shippingResult.data!.shippingCharge : 50;
+
   const total = discountedSubtotal + shippingFee;
 
   // Generate order number
