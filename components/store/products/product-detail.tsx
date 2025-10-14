@@ -111,7 +111,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
   };
 
   return (
-    <div className="container-custom">
+    <div className=" ">
       <div className="grid lg:grid-cols-2 gap-12">
         {/* Product Images */}
         <div>

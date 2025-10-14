@@ -5,7 +5,7 @@ import { useWishlist } from "@/hooks/use-wishlist";
 import { ProductCard } from "@/components/store/products/product-card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Heart, ShoppingCart, Trash2 } from "lucide-react";
-import { EmptyState } from "@/components/ui/empty-state";
+
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";

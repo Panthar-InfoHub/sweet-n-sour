@@ -379,15 +379,15 @@ export default function CheckoutPage() {
     }
   };
   return (
-    <div className="min-h-screen bg-muted/30 py-8">
-      <div className="container-custom">
+    <div className="min-h-screen bg-[url('/images/checkout-bg.svg')] bg-center bg-contain bg-repeat bg-fixed  py-8">
+      <div className=" custom-container">
         <form onSubmit={handleSubmit}>
           <div className="grid lg:grid-cols-[1fr_480px] gap-8">
             {/* Left Column - Delivery Form */}
             <div className="space-y-6">
               {/* Saved Addresses Section */}
               {savedAddresses.length > 0 && (
-                <Card className="p-6 space-y-4">
+                <Card className="p-6 space-y-2">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-primary" />
                     <h2 className="text-xl font-semibold">Select Delivery Address</h2>
@@ -598,10 +598,10 @@ export default function CheckoutPage() {
             </div>
 
             {/* Right Column - Order Summary */}
-            <div className="lg:sticky lg:top-8 h-fit space-y-6">
-              <Card className="p-6 space-y-6">
+            <div className="lg:sticky lg:top-8 h-full space-y-6 ">
+              <Card className="p-6 space-y-2 ">
                 {/* Cart Items */}
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {items.map((item) => (
                     <div key={item.id} className="flex gap-4">
                       <div className="relative w-16 h-16 rounded-lg border overflow-hidden bg-muted flex-shrink-0">
@@ -628,7 +628,7 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
-                <Separator />
+                <Separator className="" />
 
                 {/* Coupon */}
                 {appliedCoupon ? (
@@ -667,7 +667,7 @@ export default function CheckoutPage() {
                       />
                       <Button
                         type="button"
-                        variant="outline"
+                        variant="default"
                         className="shrink-0"
                         onClick={handleApplyCoupon}
                         disabled={isCouponApplying || !formData.coupon}
@@ -685,7 +685,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <Separator />
+                <Separator className="" />
 
                 {/* Summary */}
                 <div className="space-y-2 text-sm">
@@ -704,7 +704,7 @@ export default function CheckoutPage() {
                   )}
 
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Delivery Fee</span>
+                    <span className="text-muted-foreground">Shipping Fee</span>
                     <span className="font-medium">
                       {getShipping() === 0 ? "FREE" : formatPrice(getShipping())}
                     </span>

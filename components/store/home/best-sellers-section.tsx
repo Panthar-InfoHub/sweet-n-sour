@@ -10,7 +10,7 @@ export async function BestSellersSection() {
 
   return (
     <section className="relative py-16  overflow-hidden">
-      <div className="container-custom">
+      <div className="custom-container ">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-foreground">
           Best Seller Product
         </h2>

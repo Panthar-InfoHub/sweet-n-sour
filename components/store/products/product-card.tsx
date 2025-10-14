@@ -97,12 +97,12 @@ export function ProductCard({ product }: ProductCardProps) {
       </Button>
 
       {/* Product Image */}
-      <div className="relative aspect-square w-full overflow-hidden  p-8">
+      <div className="relative aspect-video h-48 w-full overflow-hidden  p-8">
         <Image
           src={product.images[0] || "/placeholder.svg"}
           alt={product.name}
           fill
-          className="object-contain"
+          className="object-contain "
           loading="lazy"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />

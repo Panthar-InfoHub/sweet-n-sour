@@ -23,7 +23,7 @@ export async function RelatedProducts({ currentProductId, categoryId }: RelatedP
   }
 
   return (
-    <section className="container-custom py-16">
+    <section className="  py-16">
       <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Explore Related Products</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

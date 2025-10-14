@@ -7,7 +7,6 @@ export default function HomePage() {
   return (
     <>
       <Banner />
-      {/* <HeroSection /> */}
       <CategorySection />
       <BestSellersSection />
       <MoodSection />

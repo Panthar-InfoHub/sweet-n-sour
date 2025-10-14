@@ -1,78 +1,87 @@
-import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users, Package } from "lucide-react";
-import { MOCK_DASHBOARD_STATS } from "@/utils/constants";
-import { formatPrice } from "@/utils/format";
-import { Card, CardContent } from "@/components/ui/card";
+  "use client";
 
-export function DashboardStats() {
-  const stats = MOCK_DASHBOARD_STATS;
+  import { MetricCard } from "./metric-card";
+  import { formatCurrency } from "@/utils/format";
 
-  const cards = [
-    {
-      title: "Total Revenue",
-      value: formatPrice(stats.totalRevenue),
-      change: stats.revenueChange,
-      icon: DollarSign,
-      gradient: "from-blue-500 to-cyan-500",
-    },
-    {
-      title: "Total Orders",
-      value: stats.totalOrders.toLocaleString(),
-      change: stats.ordersChange,
-      icon: ShoppingCart,
-      gradient: "from-green-500 to-emerald-500",
-    },
-    {
-      title: "Total Customers",
-      value: stats.totalCustomers.toLocaleString(),
-      change: stats.customersChange,
-      icon: Users,
-      gradient: "from-purple-500 to-pink-500",
-    },
-    {
-      title: "Total Products",
-      value: stats.totalProducts.toLocaleString(),
-      change: stats.productsChange,
-      icon: Package,
-      gradient: "from-orange-500 to-red-500",
-    },
-  ];
+  interface DashboardStatsProps {
+    stats: {
+      totalRevenue: number;
+      totalOrders: number;
+      totalCustomers: number;
+      totalProducts: number;
+      revenueChange: number;
+      ordersChange: number;
+      customersChange: number;
+      productsChange: number;
+      todayRevenue: number;
+      todayOrders: number;
+    };
+    timeFilter?: "today" | "30days" | "90days" | "lifetime";
+  }
 
-  return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map((card) => {
-        const Icon = card.icon;
-        const isPositive = card.change >= 0;
+  // Generate sparkline data for visual interest
+  const generateSparkline = (value: number, trend: number) => {
+    const baseValue = value / 12;
+    const data = [];
+    for (let i = 0; i < 12; i++) {
+      const variance = Math.random() * 0.3 - 0.15;
+      const trendFactor = (trend / 100) * (i / 11);
+      data.push({
+        value: baseValue * (1 + variance + trendFactor),
+      });
+    }
+    return data;
+  };
 
-        return (
-          <Card key={card.title} className="overflow-hidden">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div
-                  className={`h-12 w-12 rounded-xl bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-lg`}
-                >
-                  <Icon className="h-6 w-6 text-white" />
-                </div>
-                <div
-                  className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${
-                    isPositive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {isPositive ? (
-                    <TrendingUp className="h-3 w-3" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3" />
-                  )}
-                  {Math.abs(card.change)}%
-                </div>
-              </div>
-              <div className="mt-4">
-                <h3 className="text-3xl font-bold tracking-tight">{card.value}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{card.title}</p>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
-  );
-}
+  export function DashboardStats({ stats, timeFilter = "30days" }: DashboardStatsProps) {
+    const isToday = timeFilter === "today";
+
+    const cards = [
+      {
+        title: isToday ? "Today's Revenue" : "Revenue",
+        value: formatCurrency(stats.totalRevenue),
+        change: stats.revenueChange,
+        color: "text-blue-600 dark:text-blue-400",
+        sparklineData: generateSparkline(stats.totalRevenue, stats.revenueChange),
+        subtitle: isToday ? undefined : `Today: ${formatCurrency(stats.todayRevenue)}`,
+      },
+      {
+        title: "Total Orders",
+        value: stats.totalOrders.toLocaleString(),
+        change: stats.ordersChange,
+        color: "text-emerald-600 dark:text-emerald-400",
+        sparklineData: generateSparkline(stats.totalOrders, stats.ordersChange),
+        subtitle: isToday ? undefined : `Today: ${stats.todayOrders}`,
+      },
+      {
+        title: "Total Customers",
+        value: stats.totalCustomers.toLocaleString(),
+        change: stats.customersChange,
+        color: "text-purple-600 dark:text-purple-400",
+        sparklineData: generateSparkline(stats.totalCustomers, stats.customersChange),
+      },
+      {
+        title: "Products",
+        value: stats.totalProducts.toLocaleString(),
+        change: stats.productsChange,
+        color: "text-orange-600 dark:text-orange-400",
+        sparklineData: generateSparkline(stats.totalProducts, stats.productsChange),
+      },
+    ];
+
+    return (
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {cards.map((card) => (
+          <MetricCard
+            key={card.title}
+            title={card.title}
+            value={card.value}
+            change={card.change}
+            sparklineData={card.sparklineData}
+            color={card.color}
+            subtitle={card.subtitle}
+          />
+        ))}
+      </div>
+    );
+  }

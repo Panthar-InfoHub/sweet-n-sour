@@ -19,8 +19,8 @@ export function Header() {
 
   return (
     <>
-      <nav className="bg-brand-primary sticky top-0 z-50">
-        <div className="container-custom">
+      <nav className="bg-brand-primary sticky top-0 z-50 ">
+        <div className=" custom-container">
           <div className="flex items-center justify-between gap-4 py-4">
             {/* Mobile Menu */}
             <Sheet>

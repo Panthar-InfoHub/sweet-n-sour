@@ -8,7 +8,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Image from "next/image";
-import Autoplay from "embla-carousel-autoplay"
+import Autoplay from "embla-carousel-autoplay";
 const slides = [
   { id: 1, src: "/images/slide-1.svg", alt: "Fresh Dairy Products" },
   { id: 2, src: "/images/slide-2.svg", alt: "Organic Goodness Delivered" },
@@ -16,21 +16,19 @@ const slides = [
 ];
 
 export default function Banner() {
-
   return (
-    <div className="w-full px-4 py-4">
+    <div className="w-full px-4 py-4 custom-container">
       <Carousel
         className="w-full"
         opts={{
-            loop:true,
-
+          loop: true,
         }}
-          plugins={[
-        Autoplay({
-          delay: 3000,
-          stopOnInteraction:true,
-        }),
-      ]}
+        plugins={[
+          Autoplay({
+            delay: 3000,
+            stopOnInteraction: true,
+          }),
+        ]}
       >
         <CarouselContent>
           {slides.map((slide) => (

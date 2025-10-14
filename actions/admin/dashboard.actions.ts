@@ -1,66 +1,97 @@
 "use server";
 
 import { prisma } from "@/prisma/db";
+import { transformProductsWithSignedUrls } from "@/lib/image-utils";
 
-// Get dashboard statistics
-export async function getDashboardStats() {
+// Get dashboard statistics with time filter
+export async function getDashboardStats(
+  timeFilter: "today" | "30days" | "90days" | "lifetime" = "today"
+) {
   try {
     const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
-    // Current month stats
+    // Determine date range based on filter
+    let startDate: Date;
+    let previousStartDate: Date;
+    let previousEndDate: Date;
+
+    if (timeFilter === "today") {
+      startDate = startOfToday;
+      // Previous day for comparison
+      previousStartDate = new Date(startOfToday.getTime() - 24 * 60 * 60 * 1000);
+      previousEndDate = startOfToday;
+    } else if (timeFilter === "30days") {
+      startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      previousStartDate = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+      previousEndDate = startDate;
+    } else if (timeFilter === "90days") {
+      startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+      previousStartDate = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
+      previousEndDate = startDate;
+    } else {
+      // Lifetime
+      startDate = new Date(0); // Beginning of time
+      previousStartDate = new Date(0);
+      previousEndDate = new Date(0);
+    }
+
+    // Get stats for current period and previous period
     const [
       totalRevenue,
       totalOrders,
       totalCustomers,
       totalProducts,
-      lastMonthRevenue,
-      lastMonthOrders,
-      lastMonthCustomers,
+      previousRevenue,
+      todayRevenue,
+      todayOrders,
     ] = await Promise.all([
+      // Total revenue - only count successfully paid orders (time-filtered)
       prisma.order.aggregate({
         where: {
-          createdAt: { gte: startOfMonth },
-          status: { notIn: ["CANCELLED"] },
+          createdAt: { gte: startDate },
+          paymentStatus: "SUCCESS",
         },
         _sum: { total: true },
       }),
-      prisma.order.count({
-        where: { createdAt: { gte: startOfMonth } },
-      }),
+      // Total orders - ALL orders ever (not time-filtered)
+      prisma.order.count(),
+      // Total customers - ALL customers ever (not time-filtered)
       prisma.user.count({
-        where: { role: "USER", createdAt: { gte: startOfMonth } },
+        where: { role: "USER" },
       }),
+      // Total products
       prisma.product.count(),
+      // Previous period revenue - only successfully paid (for comparison)
       prisma.order.aggregate({
         where: {
-          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-          status: { notIn: ["CANCELLED"] },
+          createdAt: { gte: previousStartDate, lte: previousEndDate },
+          paymentStatus: "SUCCESS",
+        },
+        _sum: { total: true },
+      }),
+      // Today's stats - only successfully paid
+      prisma.order.aggregate({
+        where: {
+          createdAt: { gte: startOfToday },
+          paymentStatus: "SUCCESS",
         },
         _sum: { total: true },
       }),
       prisma.order.count({
-        where: {
-          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-        },
-      }),
-      prisma.user.count({
-        where: {
-          role: "USER",
-          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-        },
+        where: { createdAt: { gte: startOfToday } },
       }),
     ]);
 
     // Calculate percentage changes
-    const revenueChange = calculatePercentageChange(
-      lastMonthRevenue._sum.total || 0,
-      totalRevenue._sum.total || 0
-    );
-    const ordersChange = calculatePercentageChange(lastMonthOrders, totalOrders);
-    const customersChange = calculatePercentageChange(lastMonthCustomers, totalCustomers);
+    const revenueChange =
+      timeFilter === "lifetime"
+        ? 0
+        : calculatePercentageChange(previousRevenue._sum.total || 0, totalRevenue._sum.total || 0);
+    // Orders and Customers now show totals, so no growth percentage
+    const ordersChange = 0;
+    const customersChange = 0;
 
     return {
       success: true,
@@ -72,7 +103,10 @@ export async function getDashboardStats() {
         revenueChange,
         ordersChange,
         customersChange,
-        productsChange: 0, // Products don't have a monthly change metric
+        productsChange: 0,
+        // Today's stats
+        todayRevenue: todayRevenue._sum.total || 0,
+        todayOrders,
       },
     };
   } catch (error) {
@@ -171,8 +205,11 @@ export async function getTopProducts(limit: number = 5) {
       },
     });
 
+    // Transform images to signed URLs
+    const productsWithSignedUrls = await transformProductsWithSignedUrls(products);
+
     const data = topProducts.map((item) => {
-      const product = products.find((p) => p.id === item.productId);
+      const product = productsWithSignedUrls.find((p) => p.id === item.productId);
       return {
         id: item.productId,
         name: product?.name || "Unknown",
@@ -194,6 +231,41 @@ export async function getTopProducts(limit: number = 5) {
 function calculatePercentageChange(oldValue: number, newValue: number): number {
   if (oldValue === 0) return newValue > 0 ? 100 : 0;
   return Math.round(((newValue - oldValue) / oldValue) * 100);
+}
+
+// Get order stats by status
+export async function getOrdersByStatus(timeFilter: "30days" | "90days" | "lifetime" = "30days") {
+  try {
+    const now = new Date();
+    let startDate: Date;
+
+    if (timeFilter === "30days") {
+      startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    } else if (timeFilter === "90days") {
+      startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    } else {
+      startDate = new Date(0);
+    }
+
+    const statuses = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "FAILED"];
+
+    const statusCounts = await Promise.all(
+      statuses.map(async (status) => {
+        const count = await prisma.order.count({
+          where: {
+            createdAt: { gte: startDate },
+            status: status as any,
+          },
+        });
+        return { status, count };
+      })
+    );
+
+    return { success: true, data: statusCounts };
+  } catch (error) {
+    console.error("Error fetching orders by status:", error);
+    return { success: false, error: "Failed to fetch order status data" };
+  }
 }
 
 // Helper function to generate consistent colors for categories

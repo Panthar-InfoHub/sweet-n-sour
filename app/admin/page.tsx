@@ -1,32 +1,32 @@
+import {
+  getDashboardStats,
+  getRevenueData,
+  getCategoryDistribution,
+  getTopProducts,
+} from "@/actions/admin/dashboard.actions";
+import { DashboardClient } from "@/components/admin/dashboard/dashboard-client";
 
-import { DashboardStats } from "@/components/admin/dashboard/dashboard-stats"
-import { RevenueAreaChart } from "@/components/admin/dashboard/revenue-area-chart"
-import { OrdersBarChart } from "@/components/admin/dashboard/orders-bar-chart"
-import { CategoryPieChart } from "@/components/admin/dashboard/category-pie-chart"
-import { RecentOrders } from "@/components/admin/dashboard/recent-orders"
-import { TopProducts } from "@/components/admin/dashboard/top-products"
+export default async function AdminDashboardPage() {
+  // Fetch all data server-side
+  const [statsResult, revenueResult, categoryResult, topProductsResult] = await Promise.all([
+    getDashboardStats(),
+    getRevenueData(),
+    getCategoryDistribution(),
+    getTopProducts(5),
+  ]);
 
-export default function AdminDashboardPage() {
+  const stats = statsResult.success && statsResult.data ? statsResult.data : null;
+  const revenueData = revenueResult.success && revenueResult.data ? revenueResult.data : [];
+  const categoryData = categoryResult.success && categoryResult.data ? categoryResult.data : [];
+  const topProducts =
+    topProductsResult.success && topProductsResult.data ? topProductsResult.data : [];
+
   return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Welcome back! Here's what's happening with your store.</p>
-        </div>
-
-        <DashboardStats />
-
-        <RevenueAreaChart />
-
-        <div className="grid lg:grid-cols-2 gap-6">
-          <OrdersBarChart />
-          <CategoryPieChart />
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-6">
-          <TopProducts />
-          <RecentOrders />
-        </div>
-      </div>
-  )
+    <DashboardClient
+      initialStats={stats}
+      initialRevenue={revenueData}
+      initialCategories={categoryData}
+      initialTopProducts={topProducts}
+    />
+  );
 }

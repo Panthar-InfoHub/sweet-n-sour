@@ -32,8 +32,8 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   };
 
   return (
-    <main className="min-h-screen py-8">
-      <div className="container-custom">
+    <main className="min-h-screen py-8 bg-[url('/images/checkout-bg.svg')] bg-contain bg-repeat bg-center bg-fixed">
+      <div className=" custom-container">
         <h1 className="text-3xl font-bold mb-8">My Account</h1>
 
         <div className="grid lg:grid-cols-[280px_1fr] gap-8">
