@@ -1,9 +1,28 @@
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import { ProductsTable } from "@/components/admin/products/products-table";
+import { ProductsTableWrapper } from "@/components/admin/products/products-table-wrapper";
+import { requireAdmin } from "@/lib/admin-auth";
+import { Card, CardContent } from "@/components/ui/card";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-export default function AdminProductsPage() {
+interface AdminProductsPageProps {
+  searchParams: Promise<{
+    search?: string;
+    category?: string;
+    status?: string;
+    featured?: string;
+    page?: string;
+  }>;
+}
+
+export default async function AdminProductsPage({ searchParams }: AdminProductsPageProps) {
+  // Protect page - only admins can access
+  await requireAdmin();
+
+  const params = await searchParams;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -19,7 +38,17 @@ export default function AdminProductsPage() {
         </Button>
       </div>
 
-      <ProductsTable />
+      <Suspense
+        fallback={
+          <Card>
+            <CardContent className="flex items-center justify-center py-12">
+              <LoadingSpinner />
+            </CardContent>
+          </Card>
+        }
+      >
+        <ProductsTableWrapper filters={params} />
+      </Suspense>
     </div>
   );
 }

@@ -37,7 +37,7 @@ export function SearchDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-          <Search className="h-5 w-5" />
+          <Search className="h-5 w-5 text-white hover:text-white" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">

@@ -5,8 +5,12 @@ import {
   getTopProducts,
 } from "@/actions/admin/dashboard.actions";
 import { DashboardClient } from "@/components/admin/dashboard/dashboard-client";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export default async function AdminDashboardPage() {
+  // Protect page - only admins can access
+  await requireAdmin();
+
   // Fetch all data server-side
   const [statsResult, revenueResult, categoryResult, topProductsResult] = await Promise.all([
     getDashboardStats(),

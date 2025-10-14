@@ -1,7 +1,18 @@
 import { prisma } from "@/prisma/db";
 import { NextResponse } from "next/server";
+import { getAdminSession } from "@/lib/admin-auth";
 
 export async function GET() {
+  // Protect API route - only admins can access
+  const session = await getAdminSession();
+
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized - Admin access required" },
+      { status: 403 }
+    );
+  }
+
   try {
     const orders = await prisma.order.findMany({
       take: 5,

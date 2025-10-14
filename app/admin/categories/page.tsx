@@ -1,23 +1,16 @@
-"use client";
-
 import { Suspense } from "react";
 import { CategoriesTable } from "@/components/admin/category/categories-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import Link from "next/link";
+import { requireAdmin } from "@/lib/admin-auth";
+import { Card, CardContent } from "@/components/ui/card";
 
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-4">
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-32 w-full" />
-    </div>
-  );
-}
+export default async function AdminCategoriesPage() {
+  // Protect page - only admins can access
+  await requireAdmin();
 
-export default function AdminCategoriesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -33,7 +26,15 @@ export default function AdminCategoriesPage() {
         </Button>
       </div>
 
-      <Suspense fallback={<LoadingSkeleton />}>
+      <Suspense
+        fallback={
+          <Card>
+            <CardContent className="flex items-center justify-center py-12">
+              <LoadingSpinner />
+            </CardContent>
+          </Card>
+        }
+      >
         <CategoriesTable />
       </Suspense>
     </div>

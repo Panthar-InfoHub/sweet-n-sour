@@ -3,6 +3,7 @@ import { getSiteConfig } from "@/actions/admin/site-config.actions";
 import { SiteConfigForm } from "@/components/admin/settings/site-config-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export const metadata = {
   title: "Site Settings - Admin",
@@ -10,6 +11,9 @@ export const metadata = {
 };
 
 export default async function SettingsPage() {
+  // Protect page - only admins can access
+  await requireAdmin();
+
   return (
     <div className="space-y-6">
       <div>

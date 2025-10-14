@@ -1,9 +1,23 @@
-import { OrdersTable } from "@/components/admin/orders/orders-table";
-import { getOrders } from "@/actions/admin/order.actions";
+import { Suspense } from "react";
+import { OrdersTableWrapper } from "@/components/admin/orders/orders-table-wrapper";
+import { requireAdmin } from "@/lib/admin-auth";
+import { Card, CardContent } from "@/components/ui/card";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-export default async function AdminOrdersPage() {
-  const result = await getOrders();
-  const orders = result.success ? result.data : [];
+interface AdminOrdersPageProps {
+  searchParams: Promise<{
+    search?: string;
+    status?: string;
+    payment?: string;
+    page?: string;
+  }>;
+}
+
+export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageProps) {
+  // Protect page - only admins can access
+  await requireAdmin();
+
+  const params = await searchParams;
 
   return (
     <div className="space-y-6">
@@ -12,7 +26,17 @@ export default async function AdminOrdersPage() {
         <p className="text-muted-foreground mt-1">Manage customer orders and fulfillment</p>
       </div>
 
-      <OrdersTable orders={orders || []} />
+      <Suspense
+        fallback={
+          <Card>
+            <CardContent className="flex items-center justify-center py-12">
+              <LoadingSpinner />
+            </CardContent>
+          </Card>
+        }
+      >
+        <OrdersTableWrapper filters={params} />
+      </Suspense>
     </div>
   );
 }

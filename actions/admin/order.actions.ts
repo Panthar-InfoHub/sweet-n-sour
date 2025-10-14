@@ -3,6 +3,7 @@
 import { prisma } from "@/prisma/db";
 import { revalidatePath } from "next/cache";
 import { OrderStatus, PaymentStatus } from "@/prisma/generated/prisma";
+import { requireAdmin } from "@/lib/admin-auth";
 
 // Get all orders with filtering
 export async function getOrders(filters?: {
@@ -116,6 +117,8 @@ export async function getOrder(id: string) {
 
 // Update order status
 export async function updateOrderStatus(id: string, status: OrderStatus) {
+  await requireAdmin();
+
   try {
     const order = await prisma.order.update({
       where: { id },
@@ -141,6 +144,8 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
 
 // Update payment status
 export async function updatePaymentStatus(id: string, paymentStatus: PaymentStatus) {
+  await requireAdmin();
+
   try {
     const order = await prisma.order.update({
       where: { id },
@@ -169,6 +174,8 @@ export async function updatePaymentStatus(id: string, paymentStatus: PaymentStat
 
 // Delete order (admin only - use with caution)
 export async function deleteOrder(id: string) {
+  await requireAdmin();
+
   try {
     await prisma.order.delete({
       where: { id },

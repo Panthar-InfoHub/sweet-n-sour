@@ -3,8 +3,12 @@ import { CouponsTable } from "@/components/admin/coupons";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export default async function AdminCouponsPage() {
+  // Protect page - only admins can access
+  await requireAdmin();
+
   const result = await getCoupons();
   const coupons = result.success ? result.data : [];
 

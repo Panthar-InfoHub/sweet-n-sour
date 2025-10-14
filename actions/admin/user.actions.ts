@@ -3,9 +3,11 @@
 import { prisma } from "@/prisma/db";
 import { revalidatePath } from "next/cache";
 import { USER_ROLE } from "@/prisma/generated/prisma";
+import { requireAdmin } from "@/lib/admin-auth";
 
 // Get all users with filtering
 export async function getUsers(filters?: { role?: USER_ROLE; search?: string }) {
+  await requireAdmin();
   try {
     const where: any = {};
 
@@ -118,6 +120,8 @@ export async function getUser(id: string) {
 
 // Get user statistics
 export async function getUserStats() {
+  await requireAdmin();
+
   try {
     const [totalUsers, adminCount, userCount] = await Promise.all([
       prisma.user.count(),
@@ -136,5 +140,34 @@ export async function getUserStats() {
   } catch (error) {
     console.error("Error fetching user stats:", error);
     return { success: false, error: "Failed to fetch user statistics" };
+  }
+}
+
+// Update user role (ADMIN only)
+export async function updateUserRole(userId: string, newRole: USER_ROLE) {
+  await requireAdmin();
+
+  try {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { role: newRole },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    revalidatePath("/admin/users");
+
+    return {
+      success: true,
+      data: user,
+      message: `User role updated to ${newRole} successfully`,
+    };
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    return { success: false, error: "Failed to update user role" };
   }
 }

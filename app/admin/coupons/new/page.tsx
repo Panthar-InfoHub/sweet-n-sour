@@ -1,6 +1,10 @@
 import { CouponFormDefault as CouponForm } from "@/components/admin/coupons";
+import { requireAdmin } from "@/lib/admin-auth";
 
-export default function NewCouponPage() {
+export default async function NewCouponPage() {
+  // Protect page - only admins can access
+  await requireAdmin();
+
   return (
     <div className="space-y-6 max-w-4xl">
       <div>

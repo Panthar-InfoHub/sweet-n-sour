@@ -5,6 +5,7 @@ import { prisma } from "@/prisma/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCachedSignedUrl } from "@/lib/image-utils";
+import { requireAdmin } from "@/lib/admin-auth";
 
 // Validation Schema
 
@@ -110,6 +111,8 @@ export async function getCategoryBySlug(slug: string) {
 
 // Create category
 export async function createCategory(data: CategoryFormData) {
+  await requireAdmin();
+
   try {
     // Validate data
     const validatedData = categorySchema.parse(data);
@@ -140,6 +143,8 @@ export async function createCategory(data: CategoryFormData) {
 
 // Update category
 export async function updateCategory(id: string, data: CategoryFormData) {
+  await requireAdmin();
+
   try {
     // Validate data
     const validatedData = categorySchema.parse(data);
@@ -171,6 +176,8 @@ export async function updateCategory(id: string, data: CategoryFormData) {
 
 // Delete category
 export async function deleteCategory(id: string) {
+  await requireAdmin();
+
   try {
     // Check if category has products
     const category = await prisma.category.findUnique({
@@ -207,6 +214,8 @@ export async function deleteCategory(id: string) {
 
 // Toggle category active status
 export async function toggleCategoryStatus(id: string) {
+  await requireAdmin();
+
   try {
     const category = await prisma.category.findUnique({
       where: { id },

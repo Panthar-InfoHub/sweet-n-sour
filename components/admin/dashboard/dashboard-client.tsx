@@ -63,19 +63,15 @@ export function DashboardClient({
       {/* Main Revenue & Orders Area Chart - Rectangular & Colorful */}
       <RevenueAreaChart data={revenueData} />
 
-      {/* Three Column Grid for Charts */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      {/* Two Column Grid for Charts */}
+      <div className="grid lg:grid-cols-2 gap-6">
         {/* Category Performance Radar */}
         <CategoryPerformance data={categoryData} />
 
         {/* Monthly Orders Bar Chart */}
         <OrdersComparison data={revenueData} />
-
-        {/* Top Products */}
-        <TopProductsList products={topProducts} />
       </div>
-
-      {/* Order Status Distribution - New */}
+      {/* Order Status Distribution */}
       <OrderStatusChart />
 
       {/* Recent Orders Full Width */}

@@ -1,8 +1,7 @@
 "use server";
 
 import { prisma } from "@/prisma/db";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { requireAdmin } from "@/lib/admin-auth";
 
 // Get site configuration (or create default if doesn't exist)
 export async function getSiteConfig() {
@@ -35,16 +34,9 @@ export async function updateSiteConfig(data: {
   showAnnouncementBar?: boolean;
   announcementText?: string;
 }) {
+  await requireAdmin();
+
   try {
-    // Check admin authentication
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-
-    if (!session?.user || session.user.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
-    }
-
     // Get or create config
     let config = await prisma.siteConfig.findFirst();
 

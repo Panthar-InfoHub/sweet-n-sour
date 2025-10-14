@@ -5,6 +5,7 @@ import { prisma } from "@/prisma/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { transformProductsWithSignedUrls, transformProductWithSignedUrls } from "@/lib/image-utils";
+import { requireAdmin } from "@/lib/admin-auth";
 
 // Get all products with filtering (including ratings for admin)
 export async function getProducts(filters?: {
@@ -108,6 +109,8 @@ export async function getProductBySlug(slug: string) {
 
 // Create product
 export async function createProduct(data: ProductFormData) {
+  await requireAdmin();
+
   try {
     // Validate data
     const validatedData = productSchema.parse(data);
@@ -159,6 +162,8 @@ export async function createProduct(data: ProductFormData) {
 
 // Update product
 export async function updateProduct(id: string, data: ProductFormData) {
+  await requireAdmin();
+
   try {
     // Validate data
     const validatedData = productSchema.parse(data);
@@ -211,6 +216,8 @@ export async function updateProduct(id: string, data: ProductFormData) {
 
 // Delete product
 export async function deleteProduct(id: string) {
+  await requireAdmin();
+
   try {
     await prisma.product.delete({
       where: { id },
@@ -230,6 +237,8 @@ export async function updateVariantStock(
   variantIndex: number,
   stockQuantity: number
 ) {
+  await requireAdmin();
+
   try {
     if (stockQuantity < 0) {
       return { success: false, error: "Stock quantity cannot be negative" };
@@ -277,6 +286,8 @@ export async function updateVariantStock(
 
 // Toggle product featured status
 export async function toggleProductFeatured(id: string) {
+  await requireAdmin();
+
   try {
     const product = await prisma.product.findUnique({
       where: { id },
@@ -301,6 +312,8 @@ export async function toggleProductFeatured(id: string) {
 
 // Toggle product best seller status
 export async function toggleProductBestSeller(id: string) {
+  await requireAdmin();
+
   try {
     const product = await prisma.product.findUnique({
       where: { id },
@@ -325,6 +338,8 @@ export async function toggleProductBestSeller(id: string) {
 
 // Toggle product sale status
 export async function toggleProductSale(id: string) {
+  await requireAdmin();
+
   try {
     const product = await prisma.product.findUnique({
       where: { id },

@@ -24,7 +24,7 @@ import { OrderStatusDialog } from "./order-status-dialog";
 import { PaymentStatusDialog } from "./payment-status-dialog";
 import { OrderStatus } from "@/prisma/generated/prisma";
 import { deleteOrder } from "@/actions/admin/order.actions";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { DeleteConfirmDialog } from "@/components/admin/shared/delete-confirm-dialog";
 
@@ -49,6 +49,8 @@ interface Order {
 
 interface OrdersTableProps {
   orders: Order[];
+  currentPage: number;
+  totalPages: number;
 }
 
 const getStatusColor = (status: OrderStatus) => {
@@ -85,14 +87,15 @@ const getPaymentStatusColor = (status: string) => {
   }
 };
 
-export function OrdersTable({ orders }: OrdersTableProps) {
+export function OrdersTable({ orders, currentPage, totalPages }: OrdersTableProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isOrderStatusOpen, setIsOrderStatusOpen] = useState(false);
   const [isPaymentStatusOpen, setIsPaymentStatusOpen] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
-  const router = useRouter();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const handleViewDetails = (orderId: string) => {
     setSelectedOrderId(orderId);
@@ -130,6 +133,12 @@ export function OrdersTable({ orders }: OrdersTableProps) {
 
   const totalItems = (items: Array<{ quantity: number }>) => {
     return items.reduce((sum, item) => sum + item.quantity, 0);
+  };
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", page.toString());
+    router.push(`?${params.toString()}`);
   };
 
   return (
@@ -216,6 +225,34 @@ export function OrdersTable({ orders }: OrdersTableProps) {
             )}
           </TableBody>
         </Table>
+
+        {totalPages > 1 && (
+          <div className="border-t px-6 py-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Page {currentPage} of {totalPages}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <OrderDetailsDialog
