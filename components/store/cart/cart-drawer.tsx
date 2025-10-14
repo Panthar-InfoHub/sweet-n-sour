@@ -24,10 +24,10 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-md flex flex-col p-0">
+    <Sheet open={open} onOpenChange={onOpenChange} >
+      <SheetContent side="right" className="w-full sm:max-w-md flex flex-col p-0 bg-brand-background">
         {/* Header */}
-        <SheetHeader className="px-6 py-4 border-b">
+        <SheetHeader className="px-6 py-4 border-b bg-brand-background">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-xl font-semibold">
               Shopping Cart ({items.length})
@@ -67,7 +67,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
 
         {/* Footer with Summary */}
         {items.length > 0 && (
-          <div className="border-t bg-muted/30 px-6 py-4 space-y-4">
+          <div className="border-t bg-brand-background px-6 py-4 space-y-4">
             {/* Summary */}
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -92,7 +92,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             {/* Checkout Button */}
             <Button
               onClick={handleCheckout}
-              className="w-full bg-primary hover:bg-primary/90 h-12 text-base font-semibold"
+              className="w-full  h-12 text-base font-semibold"
               size="lg"
             >
               Proceed to Checkout
@@ -104,7 +104,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                 router.push("/products");
               }}
               variant="outline"
-              className="w-full"
+               className="w-full  h-12 text-base font-semibold"
             >
               Continue Shopping
             </Button>

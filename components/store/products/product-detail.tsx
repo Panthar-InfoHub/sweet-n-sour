@@ -116,7 +116,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
         {/* Product Images */}
         <div>
           {/* Main Image/Video */}
-          <div className="relative aspect-square bg-surface rounded-lg mb-4 overflow-hidden">
+          <div className="relative aspect-square bg-white/50 backdrop-blur-lg rounded-lg border mb-4 overflow-hidden">
             {isVideoUrl(product.images[selectedImage]) ? (
               <video
                 src={product.images[selectedImage]}
@@ -178,7 +178,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}
-                className={`relative aspect-square bg-surface rounded-lg overflow-hidden border-2 transition-colors ${
+                className={`relative aspect-square bg-white rounded-lg overflow-hidden border-2 transition-colors ${
                   selectedImage === index
                     ? "border-primary"
                     : "border-transparent hover:border-border"
@@ -198,13 +198,6 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 )}
               </button>
             ))}
-            {/* Gift Pack Option */}
-            <button className="relative aspect-square bg-surface rounded-lg overflow-hidden border-2 border-transparent hover:border-border flex items-center justify-center">
-              <div className="text-center p-1">
-                <div className="text-xl mb-0.5">🎁</div>
-                <span className="text-[10px] font-medium leading-tight">Gift?</span>
-              </div>
-            </button>
           </div>
         </div>
 

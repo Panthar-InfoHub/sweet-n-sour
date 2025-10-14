@@ -33,7 +33,7 @@ export async function RelatedProducts({ currentProductId, categoryId }: RelatedP
       </div>
 
       <div className="text-center">
-        <Button variant="outline" size="lg" asChild>
+        <Button  size="lg" asChild>
           <Link href="/products">View All Products</Link>
         </Button>
       </div>

@@ -47,7 +47,7 @@ export function MoodSection() {
           mood and bring some positivity into your day!
         </p>
         {/* decorative background */}
-        <div className=" bg-[url('/images/mood-decorative.svg')] bg-cover bg-center rounded-2xl py-8 bg-no-repeat px-4">
+        <div className=" bg-[url('/images/mood-decorative.svg')] bg-contain bg-repeat bg-center rounded-2xl py-8  px-4">
           {/* kitchen */}
           <div className="relative h-[300px] md:h-[500px] max-w-6xl mx-auto rounded-2xl overflow-hidden bg-[url('/images/mood-bg.png')] bg-no-repeat bg-cover bg-center">
             {/* Mood details tooltip at top - Dialog style */}

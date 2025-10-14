@@ -14,10 +14,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const product = result.data;
 
   return (
-    <main className=" py-8 bg-[url('/images/productpage-bg.svg')] bg-no-repeat bg-top bg-cover bg-fixed ">
-      <ProductDetail product={product} />
-      <RelatedProducts currentProductId={product.id} categoryId={product.categoryId} />
-      <div className="h-screen"></div>
+    <main className=" bg-[url('/images/checkout-bg.svg')] bg-repeat bg-center bg-contain bg-fixed py-10">
+      <div className="custom-container">
+        <ProductDetail product={product} />
+        <RelatedProducts currentProductId={product.id} categoryId={product.categoryId} />
+      </div>
     </main>
   );
 }
