@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { ProductCard } from "@/components/store/products/product-card";
 import {
   Select,
@@ -10,32 +9,62 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { SlidersHorizontal } from "lucide-react";
-import { Product } from "@/components/store/products/product-card";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Empty } from "@/components/ui/empty";
 
 interface ProductsGridProps {
-  products: Product[];
+  products: any[];
+  pagination?: {
+    page: number;
+    limit: number;
+    totalProducts: number;
+    totalPages: number;
+  };
 }
-export function ProductsGrid({ products }: ProductsGridProps) {
-  const [sortBy, setSortBy] = useState("featured");
+
+export function ProductsGrid({ products, pagination }: ProductsGridProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentSort = searchParams.get("sortBy") || "featured";
+
+  const handleSortChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("sortBy", value);
+    params.delete("page"); // Reset to page 1 when sorting
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.push(`?${params.toString()}`, { scroll: true });
+  };
 
   return (
     <div>
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-        <p className="text-sm text-foreground-muted">
-          Showing <span className="font-medium text-foreground">{products.length}</span> products
+        <p className="text-sm text-muted-foreground">
+          Showing{" "}
+          <span className="font-medium text-foreground">
+            {pagination
+              ? `${(pagination.page - 1) * pagination.limit + 1}-${Math.min(
+                  pagination.page * pagination.limit,
+                  pagination.totalProducts
+                )}`
+              : products.length}
+          </span>{" "}
+          of{" "}
+          <span className="font-medium text-foreground">
+            {pagination?.totalProducts || products.length}
+          </span>{" "}
+          products
         </p>
 
         <div className="flex items-center gap-3">
-          {/* Mobile Filter Button */}
-          <Button variant="outline" size="sm" className="lg:hidden bg-transparent">
-            <SlidersHorizontal className="h-4 w-4 mr-2" />
-            Filters
-          </Button>
-
           {/* Sort */}
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <Select value={currentSort} onValueChange={handleSortChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
@@ -54,11 +83,12 @@ export function ProductsGrid({ products }: ProductsGridProps) {
 
       {/* Products Grid */}
       {products.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            No products found. Add some products to get started.
-          </p>
-        </div>
+        <Empty className="py-20">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold mb-2">No products found</h3>
+            <p className="text-muted-foreground">Try adjusting your filters or search criteria</p>
+          </div>
+        </Empty>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
@@ -68,23 +98,61 @@ export function ProductsGrid({ products }: ProductsGridProps) {
       )}
 
       {/* Pagination */}
-      <div className="flex justify-center gap-2 mt-12">
-        <Button variant="outline" size="sm" disabled>
-          Previous
-        </Button>
-        <Button variant="default" size="sm" className="bg-primary">
-          1
-        </Button>
-        <Button variant="outline" size="sm">
-          2
-        </Button>
-        <Button variant="outline" size="sm">
-          3
-        </Button>
-        <Button variant="outline" size="sm">
-          Next
-        </Button>
-      </div>
+      {pagination && pagination.totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-12">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(pagination.page - 1)}
+            disabled={pagination.page === 1}
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Previous
+          </Button>
+
+          {/* Page Numbers */}
+          <div className="flex gap-1">
+            {[...Array(pagination.totalPages)].map((_, index) => {
+              const pageNumber = index + 1;
+              // Show first, last, current, and pages around current
+              if (
+                pageNumber === 1 ||
+                pageNumber === pagination.totalPages ||
+                (pageNumber >= pagination.page - 1 && pageNumber <= pagination.page + 1)
+              ) {
+                return (
+                  <Button
+                    key={pageNumber}
+                    variant={pageNumber === pagination.page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageChange(pageNumber)}
+                    className="min-w-[36px]"
+                  >
+                    {pageNumber}
+                  </Button>
+                );
+              } else if (pageNumber === pagination.page - 2 || pageNumber === pagination.page + 2) {
+                return (
+                  <span key={pageNumber} className="px-2 flex items-center">
+                    ...
+                  </span>
+                );
+              }
+              return null;
+            })}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(pagination.page + 1)}
+            disabled={pagination.page === pagination.totalPages}
+          >
+            Next
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

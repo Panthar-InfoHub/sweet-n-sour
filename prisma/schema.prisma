@@ -34,6 +34,7 @@ model User {
   addresses     Address[]
   couponUsages  CouponUsage[]
   wishlistItems WishlistItem[]
+  reviews       Review[]
 
   @@unique([email])
   @@map("user")
@@ -118,8 +119,26 @@ model Product {
   updatedAt     DateTime       @updatedAt
   orderItems    OrderItem[]
   wishlistItems WishlistItem[]
+  reviews       Review[]
 
   @@map("product")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int // 1-5
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, userId])
+  @@index([productId])
+  @@index([userId])
+  @@map("review")
 }
 
 enum OrderStatus {

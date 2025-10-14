@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartDrawer } from "@/components/store/cart/cart-drawer";
 import { useCart } from "@/hooks/use-cart-db";
 import { useWishlist } from "@/hooks/use-wishlist";
+import { SearchDialog } from "./search-dialog";
 
 export function Header() {
   const [cartOpen, setCartOpen] = useState(false);
@@ -94,9 +95,7 @@ export function Header() {
 
             {/* Actions */}
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-                <Search className="h-5 w-5" />
-              </Button>
+              <SearchDialog />
               <Button
                 variant="ghost"
                 size="icon"

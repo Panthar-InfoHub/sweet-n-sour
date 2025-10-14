@@ -114,8 +114,10 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center justify-between">
           <span className="text-sm  capitalize text-muted-foreground">{product.category.name}</span>
           <div className="flex items-center gap-1">
-            <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-medium">4.5</span>
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-medium">
+              {product.averageRating ? product.averageRating.toFixed(1) : "0.0"}
+            </span>
           </div>
         </div>
 
@@ -214,4 +216,6 @@ export interface Product {
   createdAt: Date;
   updatedAt: Date;
   category: Category;
+  averageRating?: number;
+  reviewCount?: number;
 }

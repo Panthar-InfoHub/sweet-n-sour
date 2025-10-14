@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { transformProductsWithSignedUrls, transformProductWithSignedUrls } from "@/lib/image-utils";
 
-// Get all products with filtering
+// Get all products with filtering (including ratings for admin)
 export async function getProducts(filters?: {
   categoryId?: string;
   search?: string;
