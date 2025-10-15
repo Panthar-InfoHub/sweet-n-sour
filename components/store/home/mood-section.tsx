@@ -37,12 +37,12 @@ export function MoodSection() {
   const [hoveredBottle, setHoveredBottle] = useState<MoodType>(null);
 
   return (
-    <section className="py-16 bg-surface">
+    <section className="py-12">
       <div className="">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 text-balance">
+        <h2 className="text-xl md:text-4xl font-bold text-center mb-4 text-balance">
           What's your mood for the day?
         </h2>
-        <p className="text-center font-semibold text-foreground-muted mb-12 max-w-2xl mx-auto text-pretty">
+        <p className="text-center text-sm md:text-base px-4  text-foreground-muted mb-8 max-w-2xl mx-auto text-pretty">
           How are you feeling today? I hope you're doing well! Let's take a moment to brighten your
           mood and bring some positivity into your day!
         </p>

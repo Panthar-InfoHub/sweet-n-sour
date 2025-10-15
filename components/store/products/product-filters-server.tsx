@@ -97,7 +97,7 @@ export function ProductFilters({ categorySlug, categories = [] }: ProductFilters
     minRating || availability !== "all" || selectedCategories.length > 0 || searchQuery;
 
   return (
-    <div className="bg-white lg:rounded-xl lg:border lg:border-border p-4 lg:sticky lg:top-24 space-y-4">
+    <div className="bg-white  lg:rounded-xl lg:border lg:border-border p-4 lg:sticky lg:top-24 space-y-4">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-semibold">Filters</h2>
         {hasActiveFilters && (

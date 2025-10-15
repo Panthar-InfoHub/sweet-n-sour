@@ -9,21 +9,21 @@ export async function BestSellersSection() {
   const products = result.success && result.data ? result.data.slice(0, 4) : [];
 
   return (
-    <section className="relative py-16  overflow-hidden">
+    <section className="relative pt-8 sm:pt-12  overflow-hidden">
       <div className="custom-container ">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-foreground">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-foreground">
           Best Seller Product
         </h2>
 
         {products.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-12">
               {products.map((product: any) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
 
-            <div className="text-center">
+            <div className="text-center ">
               <Button
                 variant="outline"
                 size="lg"

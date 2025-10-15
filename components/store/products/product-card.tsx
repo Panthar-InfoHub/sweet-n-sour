@@ -97,7 +97,7 @@ export function ProductCard({ product }: ProductCardProps) {
       </Button>
 
       {/* Product Image */}
-      <div className="relative aspect-video h-32 sm:h-48 w-full overflow-hidden p-4 sm:p-8">
+      <div className="relative aspect-square  sm:h-48 w-full overflow-hidden p-4 sm:p-8">
         <Image
           src={product.images[0] || "/placeholder.svg"}
           alt={product.name}
@@ -132,6 +132,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="text-xs sm:text-sm font-semibold text-muted-foreground mb-1">
           {selectedVariant.weight}
         </p>
+        
 
         {/* Price and Add to Cart */}
         <div className="flex items-center justify-between gap-2 pt-1">

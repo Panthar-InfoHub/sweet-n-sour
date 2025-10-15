@@ -82,7 +82,8 @@ export function ProductsGrid({
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="w-[280px] p-4 bg-brand-background overflow-y-auto"
+                className="w-[280px] p-0 bg-white overflow-y-auto"
+                onOpenAutoFocus={(e) => e.preventDefault()}
               >
                 <ProductFilters categories={categories} categorySlug={categorySlug} />
               </SheetContent>

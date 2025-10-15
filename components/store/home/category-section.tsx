@@ -3,8 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface Category {
   id: string;
@@ -18,114 +23,68 @@ interface CategorySectionProps {
 }
 
 export function CategorySection({ categories }: CategorySectionProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [itemsPerView, setItemsPerView] = useState(6);
-
-  useEffect(() => {
-    const updateItemsPerView = () => {
-      if (window.innerWidth < 640) {
-        setItemsPerView(2);
-      } else if (window.innerWidth < 768) {
-        setItemsPerView(3);
-      } else if (window.innerWidth < 1024) {
-        setItemsPerView(4);
-      } else {
-        setItemsPerView(6);
-      }
-    };
-
-    updateItemsPerView();
-    window.addEventListener("resize", updateItemsPerView);
-    return () => window.removeEventListener("resize", updateItemsPerView);
-  }, []);
-
-  const maxIndex = Math.max(0, categories.length - itemsPerView);
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => Math.max(0, prev - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
-  };
-
   if (categories.length === 0) {
     return null;
   }
 
   return (
-    <section className="py-16 relative">
+    <section className="py-8 sm:py-12 relative">
       <div className="custom-container">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-balance">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-balance">
           Choose Your Categories
         </h2>
 
-        {/* Carousel Container */}
-        <div className="relative">
-          {/* Left Button */}
-          {currentIndex > 0 && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handlePrev}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-white hover:bg-gray-50"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-          )}
-
-          {/* Categories */}
-          <div className="overflow-hidden px-2">
-            <div
-              className="flex gap-6 transition-transform duration-500 ease-out"
-              style={{
-                transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
-              }}
-            >
-              {categories.map((category) => (
+        {/* Carousel */}
+        <Carousel
+          opts={{
+            align: "start",
+            loop: false,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 sm:-ml-4">
+            {categories.map((category) => (
+              <CarouselItem
+                key={category.id}
+                className="pl-2 sm:pl-4 py-2 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
+              >
                 <Link
-                  key={category.id}
                   href={`/categories/${category.slug}`}
-                  className="group flex flex-col items-center flex-shrink-0"
-                  style={{
-                    width: `calc(${100 / itemsPerView}% - ${
-                      (24 * (itemsPerView - 1)) / itemsPerView
-                    }px)`,
-                  }}
+                  className="group flex flex-col items-center "
                 >
-                  <div className="relative w-full aspect-square mb-3 rounded-full overflow-hidden">
+                  <div className="relative w-full aspect-square mb-2 sm:mb-3  ">
                     <Image
                       src={category.image || "/images/dummy.png"}
                       alt={category.name}
+                      loading="lazy"
                       fill
-                      className="object-cover group-hover:scale-105 ease-in-out transition-transform duration-300"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
                     />
                   </div>
-                  <h3 className="font-semibold text-center group-hover:text-primary transition-colors">
+                  <h3 className="font-semibold capitalize text-center text-sm sm:text-base group-hover:text-primary transition-colors line-clamp-2">
                     {category.name}
                   </h3>
                 </Link>
-              ))}
-            </div>
-          </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
 
-          {/* Right Button */}
-          {currentIndex < maxIndex && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleNext}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-white hover:bg-gray-50"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          )}
-        </div>
+          {/* Navigation Buttons - Hidden on mobile, visible on larger screens */}
+          <CarouselPrevious className="hidden sm:flex -left-4 lg:-left-12" />
+          <CarouselNext className="hidden sm:flex -right-4 lg:-right-12" />
+        </Carousel>
 
         {/* View All Button */}
-        <div className="flex justify-center mt-8">
-          <Button variant="outline" size="lg" asChild>
-            <Link href="/products">View All Products</Link>
+        <div className="text-center mt-12">
+          <Button
+            variant="outline"
+            size="lg"
+            className="rounded-full border-primary text-primary hover:bg-primary hover:text-white bg-brand-background
+                 transition-colors"
+            asChild
+          >
+            <Link href="/categories">View All Categories</Link>
           </Button>
         </div>
       </div>
