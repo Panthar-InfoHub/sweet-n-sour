@@ -1,21 +1,23 @@
-import { CategorySection } from "@/components/store/home/category-section";
-import { BestSellersSection } from "@/components/store/home/best-sellers-section";
+import { Suspense } from "react";
+import { CategorySectionWrapper } from "@/components/store/home/category-section-wrapper";
+import { BestSellersSectionWrapper } from "@/components/store/home/best-sellers-section-wrapper";
 import { MoodSection } from "@/components/store/home/mood-section";
 import Banner from "@/components/store/home/banner";
-import { getCategories } from "@/actions/admin/category.actions";
+import { CategorySectionSkeleton, BestSellersSkeleton } from "@/components/ui/loading-skeleton";
 
-export default async function HomePage() {
-  // Fetch active categories
-  const categoriesResult = await getCategories();
-  const categories = categoriesResult.success
-    ? (categoriesResult.data || []).filter((cat) => cat.isActive)
-    : [];
-
+export default function HomePage() {
   return (
     <>
       <Banner />
-      <CategorySection categories={categories} />
-      <BestSellersSection />
+
+      <Suspense fallback={<CategorySectionSkeleton />}>
+        <CategorySectionWrapper />
+      </Suspense>
+
+      <Suspense fallback={<BestSellersSkeleton />}>
+        <BestSellersSectionWrapper />
+      </Suspense>
+
       <MoodSection />
     </>
   );

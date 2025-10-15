@@ -1,9 +1,29 @@
+import { Suspense } from "react";
 import { ProductDetail } from "@/components/store/products/product-detail";
 import { RelatedProducts } from "@/components/store/products/related-products";
 import { ProductReviews } from "@/components/store/products/product-reviews";
 import { getProductWithReviews } from "@/actions/store/product.actions";
 import { hasUserReviewedProduct } from "@/actions/store/review.actions";
 import { notFound } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Related Products Skeleton
+function RelatedProductsSkeleton() {
+  return (
+    <div className="mt-12">
+      <Skeleton className="h-8 w-48 mb-6" />
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="space-y-3">
+            <Skeleton className="w-full aspect-square" />
+            <Skeleton className="h-5 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -47,7 +67,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           userReview={userReview}
         />
 
-        <RelatedProducts currentProductId={product.id} categoryId={product.categoryId} />
+        <Suspense fallback={<RelatedProductsSkeleton />}>
+          <RelatedProducts currentProductId={product.id} categoryId={product.categoryId} />
+        </Suspense>
       </div>
     </main>
   );

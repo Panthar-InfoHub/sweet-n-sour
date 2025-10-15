@@ -5,10 +5,6 @@ import { getFilteredProducts } from "@/actions/store/product.actions";
 import { ProductsGrid } from "@/components/store/products/products-grid";
 import { ProductFilters } from "@/components/store/products/product-filters-server";
 import { ProductGridSkeleton } from "@/components/store/products/product-grid-skeleton";
-import { Button } from "@/components/ui/button";
-import { SlidersHorizontal } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import Image from "next/image";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -48,29 +44,14 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   return (
     <main className="min-h-screen">
       {/* Category Header */}
-      <div className="bg-gradient-to-b from-primary/10 to-transparent border-b border-border">
-        <div className="custom-container py-6 sm:py-12">
-          <div className="flex items-center gap-4 sm:gap-6">
-            {category.image && (
-              <div className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden shadow-md hidden sm:block">
-                <Image
-                  src={category.image}
-                  alt={category.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            )}
-            <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">
-                {category.name}
-              </h1>
-              {category.description && (
-                <p className="text-muted-foreground text-sm sm:text-lg">{category.description}</p>
-              )}
-            </div>
-          </div>
+      <div className="bg-gradient-to-b from-primary/10 to-transparent py-8 sm:py-12 md:py-16 border-b border-border bg-[url('/images/checkout-bg.svg')] bg-repeat bg-center">
+        <div className="custom-container">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-2 sm:mb-4">
+            {category.name}
+          </h1>
+          <p className="text-center text-muted-foreground text-sm sm:text-base md:text-lg">
+            {category.description}
+          </p>
         </div>
       </div>
 

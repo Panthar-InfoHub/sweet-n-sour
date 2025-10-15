@@ -4,9 +4,6 @@ import { ProductFilters } from "@/components/store/products/product-filters-serv
 import { getFilteredProducts } from "@/actions/store/product.actions";
 import { getCategories } from "@/actions/admin/category.actions";
 import { ProductGridSkeleton } from "@/components/store/products/product-grid-skeleton";
-import { Button } from "@/components/ui/button";
-import { SlidersHorizontal } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface ProductsPageProps {
   searchParams: Promise<{
@@ -42,7 +39,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   return (
     <main className="min-h-screen">
       {/* Page Header */}
-      <div className="bg-gradient-to-b from-primary/10 to-transparent py-8 sm:py-16 border-b border-border">
+      <div className="bg-gradient-to-b from-primary/10 to-transparent py-8 sm:py-16 border-b border-border bg-[url('/images/checkout-bg.svg')] bg-repeat bg-center">
         <div className="custom-container">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-2">
             All Products

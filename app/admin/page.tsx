@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import {
   getDashboardStats,
   getRevenueData,
@@ -6,11 +7,9 @@ import {
 } from "@/actions/admin/dashboard.actions";
 import { DashboardClient } from "@/components/admin/dashboard/dashboard-client";
 import { requireAdmin } from "@/lib/admin-auth";
+import { AdminDashboardSkeleton } from "@/components/ui/loading-skeleton";
 
-export default async function AdminDashboardPage() {
-  // Protect page - only admins can access
-  await requireAdmin();
-
+async function DashboardDataWrapper() {
   // Fetch all data server-side
   const [statsResult, revenueResult, categoryResult, topProductsResult] = await Promise.all([
     getDashboardStats(),
@@ -32,5 +31,16 @@ export default async function AdminDashboardPage() {
       initialCategories={categoryData}
       initialTopProducts={topProducts}
     />
+  );
+}
+
+export default async function AdminDashboardPage() {
+  // Protect page - only admins can access
+  await requireAdmin();
+
+  return (
+    <Suspense fallback={<AdminDashboardSkeleton />}>
+      <DashboardDataWrapper />
+    </Suspense>
   );
 }

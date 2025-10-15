@@ -1,6 +1,15 @@
 import { getSiteConfig } from "@/actions/admin/site-config.actions";
+import { Suspense } from "react";
 
 export async function AnnouncementBar() {
+  return (
+    <Suspense fallback={null}>
+      <BarContent />
+    </Suspense>
+  );
+}
+
+const BarContent = async () => {
   const configResult = await getSiteConfig();
 
   if (!configResult.success || !configResult.data || !configResult.data.showAnnouncementBar) {
@@ -14,4 +23,4 @@ export async function AnnouncementBar() {
       {announcementText}
     </div>
   );
-}
+};

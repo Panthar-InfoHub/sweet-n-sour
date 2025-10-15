@@ -73,11 +73,11 @@ export default function LoginPage() {
           {/* Footer */}
           <p className="text-center text-xs text-muted-foreground mt-6">
             By continuing, you agree to our{" "}
-            <a href="/terms" className="underline hover:text-primary">
+            <a href="/terms-and-conditions" className="underline hover:text-primary">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="/privacy" className="underline hover:text-primary">
+            <a href="/privacy-policy" className="underline hover:text-primary">
               Privacy Policy
             </a>
             .
