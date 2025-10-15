@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { siteConfig } from "@/site.config";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   // const searchParams = useSearchParams();
@@ -21,6 +22,7 @@ export default function LoginPage() {
         callbackURL: "/",
       });
     } catch (error) {
+      toast.error("Error during sign-in. Please try again.");
       console.error("Error during sign-in:", error);
     } finally {
       setLoading(false);

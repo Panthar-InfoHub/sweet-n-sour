@@ -4,7 +4,7 @@ export const siteConfig = {
   name: "Sweet and Sour",
   description:
     "Crafting authentic, handmade pickles with traditional recipes passed down through generations.",
-  domain: "https://sweetandsour.com",
+  domain: "https://sweetnsour.in",
   // Logo
   logo: {
     path: "/placeholder-logo.svg",
