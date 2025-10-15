@@ -117,6 +117,31 @@ export function ProductDetail({ product }: ProductDetailProps) {
     }
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: product.name,
+      text: `Check out ${product.name} - ${product.description.slice(0, 100)}...`,
+      url: window.location.href,
+    };
+
+    try {
+      // Check if Web Share API is supported
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast.success("Shared successfully!");
+      } else {
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard!");
+      }
+    } catch (error) {
+      // User cancelled or error occurred
+      if (error instanceof Error && error.name !== "AbortError") {
+        toast.error("Failed to share");
+      }
+    }
+  };
+
   return (
     <div className=" ">
       <div className="grid lg:grid-cols-2 gap-12">
@@ -319,7 +344,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 }`}
               />
             </Button>
-            <Button size="lg" variant="outline">
+            <Button size="lg" variant="outline" onClick={handleShare}>
               <Share2 className="h-5 w-5" />
             </Button>
           </div>

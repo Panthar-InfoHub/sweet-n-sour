@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { SHIPPING_COST, FREE_SHIPPING_THRESHOLD } from "@/utils/constants";
+
 import {
   getCart,
   addToCart as addToCartAction,
@@ -9,6 +9,7 @@ import {
   removeFromCart as removeFromCartAction,
   clearCart as clearCartAction,
 } from "@/actions/store/cart.actions";
+import { getShippingConfig } from "@/actions/store/shipping-config.actions";
 import { toast } from "sonner";
 
 export interface CartItem {
@@ -24,11 +25,18 @@ export interface CartItem {
   stockQuantity: number;
 }
 
+interface ShippingConfig {
+  shippingCharge: number;
+  freeShippingMinOrder: number;
+}
+
 interface CartStore {
   items: CartItem[];
   isLoading: boolean;
   isInitialized: boolean;
+  shippingConfig: ShippingConfig | null;
   fetchCart: () => Promise<void>;
+  fetchShippingConfig: () => Promise<void>;
   addItem: (productId: string, weight: string, name: string, quantity?: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
@@ -42,6 +50,23 @@ export const useCart = create<CartStore>((set, get) => ({
   items: [],
   isLoading: false,
   isInitialized: false,
+  shippingConfig: null,
+
+  fetchShippingConfig: async () => {
+    try {
+      const config = await getShippingConfig();
+      set({ shippingConfig: config });
+    } catch (error) {
+      console.error("Error fetching shipping config:", error);
+      // Set default values if fetch fails
+      set({
+        shippingConfig: {
+          shippingCharge: 50,
+          freeShippingMinOrder: 500,
+        },
+      });
+    }
+  },
 
   fetchCart: async () => {
     set({ isLoading: true });
@@ -50,6 +75,10 @@ export const useCart = create<CartStore>((set, get) => ({
       if (result.success && result.data) {
         const validItems = result.data.items.filter((item): item is CartItem => item !== null);
         set({ items: validItems, isInitialized: true });
+      }
+      // Fetch shipping config if not already loaded
+      if (!get().shippingConfig) {
+        await get().fetchShippingConfig();
       }
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -174,7 +203,13 @@ export const useCart = create<CartStore>((set, get) => ({
 
   getShipping: () => {
     const subtotal = get().getSubtotal();
-    return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+    const config = get().shippingConfig;
+
+    // Use default values if config is not loaded yet
+    const freeShippingThreshold = config?.freeShippingMinOrder || 500;
+    const shippingCost = config?.shippingCharge || 50;
+
+    return subtotal >= freeShippingThreshold ? 0 : shippingCost;
   },
 
   getTotal: () => {

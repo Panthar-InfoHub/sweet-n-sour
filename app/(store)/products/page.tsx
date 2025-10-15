@@ -4,6 +4,27 @@ import { ProductFilters } from "@/components/store/products/product-filters-serv
 import { getFilteredProducts } from "@/actions/store/product.actions";
 import { getCategories } from "@/actions/admin/category.actions";
 import { ProductGridSkeleton } from "@/components/store/products/product-grid-skeleton";
+import { siteConfig } from "@/site.config";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: `All Products - ${siteConfig.title}`,
+  description: `Browse our complete collection of handcrafted pickles and authentic flavors. Discover premium quality products made with traditional recipes.`,
+  keywords: [
+    "all pickles",
+    "pickle collection",
+    "buy pickles online",
+    "pickle varieties",
+    "authentic pickles",
+    "homemade pickles",
+    "pickle shop",
+    "organic pickles",
+    "traditional pickles",
+  ],
+  alternates: {
+    canonical: "/products",
+  },
+};
 
 interface ProductsPageProps {
   searchParams: Promise<{

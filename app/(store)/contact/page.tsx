@@ -1,9 +1,19 @@
 import { ContactForm } from "@/components/store/contact/contact-form";
 import { Metadata } from "next";
+import { siteConfig } from "@/site.config";
 
 export const metadata: Metadata = {
-  title: "Contact Us",
-  description: "Get in touch with us. We'd love to hear from you!",
+  title: `Contact Us - ${siteConfig.title}`,
+  description: `Get in touch with ${siteConfig.name}. Have questions about our products or need support? Contact us via WhatsApp, email, or phone. We're here to help!`,
+  keywords: [
+    "contact us",
+    "customer support",
+    "get in touch",
+    "contact form",
+    "customer service",
+    "help",
+    "support",
+  ],
 };
 
 export default function ContactPage() {

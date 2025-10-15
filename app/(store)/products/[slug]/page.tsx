@@ -6,6 +6,8 @@ import { getProductWithReviews } from "@/actions/store/product.actions";
 import { hasUserReviewedProduct } from "@/actions/store/review.actions";
 import { notFound } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { siteConfig } from "@/site.config";
+import { Metadata } from "next";
 
 // Related Products Skeleton
 function RelatedProductsSkeleton() {
@@ -73,4 +75,69 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       </div>
     </main>
   );
+}
+
+// Generate metadata for SEO
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const result = await getProductWithReviews(slug);
+
+  if (!result.success || !result.data) {
+    return {
+      title: "Product Not Found",
+    };
+  }
+
+  const product = result.data;
+  const variants = product.variants as any[];
+  const firstVariant = variants && variants.length > 0 ? variants[0] : null;
+  const price = firstVariant?.price || 0;
+  const compareAtPrice = firstVariant?.compareAtPrice;
+
+  // Calculate discount if applicable
+  const discount = compareAtPrice
+    ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
+    : 0;
+
+  const priceText =
+    discount > 0 ? `₹${price} (${discount}% OFF from ₹${compareAtPrice})` : `₹${price}`;
+
+  const description =
+    product.description.length > 160
+      ? `${product.description.slice(0, 160)}...`
+      : product.description;
+
+  return {
+    title: `${product.name} - ${priceText} | ${siteConfig.title}`,
+    description: description,
+    keywords: [
+      product.name,
+      ...product.tags,
+      product.category.name,
+      "buy online",
+      "premium quality",
+      "authentic",
+      "handcrafted",
+    ],
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      type: "website",
+      images: product.images.length > 0 ? [{ url: product.images[0] }] : [],
+      siteName: siteConfig.name,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.description.slice(0, 200),
+      images: product.images.length > 0 ? [product.images[0]] : [],
+    },
+    alternates: {
+      canonical: `/products/${slug}`,
+    },
+  };
 }

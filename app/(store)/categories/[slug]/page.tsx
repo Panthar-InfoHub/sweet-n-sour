@@ -5,6 +5,7 @@ import { getFilteredProducts } from "@/actions/store/product.actions";
 import { ProductsGrid } from "@/components/store/products/products-grid";
 import { ProductFilters } from "@/components/store/products/product-filters-server";
 import { ProductGridSkeleton } from "@/components/store/products/product-grid-skeleton";
+import { siteConfig } from "@/site.config";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -112,9 +113,36 @@ export async function generateMetadata({ params }: CategoryPageProps) {
   }
 
   const category = categoryResult.data;
+  const description =
+    category.description ||
+    `Browse our collection of ${category.name}. Discover authentic, handcrafted products made with traditional recipes.`;
 
   return {
-    title: `${category.name} - Shop by Category`,
-    description: category.description || `Browse our ${category.name} products`,
+    title: `${category.name} - Shop by Category | ${siteConfig.title}`,
+    description: description,
+    keywords: [
+      category.name,
+      `${category.name} products`,
+      `buy ${category.name}`,
+      "authentic",
+      "handcrafted",
+      "traditional",
+      "premium quality",
+    ],
+    openGraph: {
+      title: `${category.name} - Shop by Category`,
+      description: description,
+      type: "website",
+      images: category.image ? [{ url: category.image }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${category.name} - Shop by Category`,
+      description: description,
+      images: category.image ? [category.image] : [],
+    },
+    alternates: {
+      canonical: `/categories/${slug}`,
+    },
   };
 }

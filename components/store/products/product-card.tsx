@@ -138,7 +138,6 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="text-xs sm:text-sm font-semibold text-muted-foreground mb-1">
           {selectedVariant.weight}
         </p>
-        
 
         {/* Price and Add to Cart */}
         <div className="flex items-center justify-between gap-2 pt-1">

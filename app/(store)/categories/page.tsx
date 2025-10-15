@@ -1,6 +1,22 @@
 import { Suspense } from "react";
 import { CategoriesGridWrapper } from "@/components/store/products/categories-grid-wrapper";
 import { CategoriesGridSkeleton } from "@/components/ui/loading-skeleton";
+import { siteConfig } from "@/site.config";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: `Shop by Category - ${siteConfig.title}`,
+  description: `Explore our diverse range of handcrafted products organized by categories. Find authentic pickles, chutneys, and preserves made with traditional recipes.`,
+  keywords: [
+    "product categories",
+    "shop by category",
+    "pickle categories",
+    "browse products",
+    "product types",
+    "authentic pickles",
+    "traditional products",
+  ],
+};
 
 export default function CategoriesPage() {
   return (
