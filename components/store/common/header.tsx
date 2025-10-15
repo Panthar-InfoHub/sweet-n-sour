@@ -38,7 +38,11 @@ const navigationLinks = [
     label: "Customer Reviews",
     href: "/reviews",
   },
-] 
+  {
+    label: "Contact",
+    href: "/contact",
+  },
+]
 
 
 export function Header() {
