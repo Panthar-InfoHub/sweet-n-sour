@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/components/providers/cart-provider";
 import { WishlistSync } from "@/components/providers/wishlist-sync";
+import { siteConfig } from "@/site.config";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -21,8 +22,8 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "Pickle Paradise - Premium Artisan Pickles",
-  description: "Discover our handcrafted selection of premium pickles, chutneys, and preserves",
+  title: `${siteConfig.title} - Premium Artisan Pickles`,
+  description: siteConfig.description,
   generator: "v0.app",
 };
 

@@ -12,6 +12,7 @@ import {
   Store,
   Tag,
 } from "lucide-react";
+import { siteConfig } from "@/site.config";
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +25,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -50,8 +50,10 @@ export function AdminSidebar() {
                   <Store className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Pickle Store</span>
-                  <span className="truncate text-xs text-muted-foreground">Admin Panel</span>
+                  <span className="truncate font-semibold">{siteConfig.admin.title}</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {siteConfig.admin.subtitle}
+                  </span>
                 </div>
               </Link>
             </SidebarMenuButton>

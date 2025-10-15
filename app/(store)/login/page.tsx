@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 // import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useState } from "react";
+import { siteConfig } from "@/site.config";
 
 export default function LoginPage() {
   // const searchParams = useSearchParams();
@@ -21,7 +22,7 @@ export default function LoginPage() {
       });
     } catch (error) {
       console.error("Error during sign-in:", error);
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -31,13 +32,12 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white/5 backdrop-blur-xs rounded-lg shadow-sm border border-gray-200">
         <div className=" p-8 md:p-10">
           {/* Logo */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center items-center mx-auto mb-6 relative rounded-lg w-32 h-10">
             <Image
-              src="/logo.svg"
-              alt="Brand Logo"
-              width={48}
-              height={48}
-              className="rounded-lg border-2  bg-brand-primary"
+              src={siteConfig.logo.path}
+              alt={siteConfig.logo.alt}
+              fill
+              className="object-contain"
             />
           </div>
 
@@ -46,7 +46,7 @@ export default function LoginPage() {
             Welcome Back
           </h1>
           <p className="text-center font-semibold text-muted-foreground mb-8 text-sm">
-            Sign in to Sweet and Sour
+            Sign in to {siteConfig.title}
           </p>
 
           {/* Sign-in Button */}

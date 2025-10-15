@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
@@ -7,7 +8,7 @@ import { AdminPanelLink } from "@/components/shared/admin-panel-link";
 import { HeaderCartButton } from "./header-cart-button";
 import { HeaderWishlistButton } from "./header-wishlist-button";
 import { MobileMenu } from "./mobile-menu";
-
+import { siteConfig } from "@/site.config";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Loading fallback for interactive buttons
@@ -42,8 +43,7 @@ const navigationLinks = [
     label: "Contact",
     href: "/contact",
   },
-]
-
+];
 
 export function Header() {
   return (
@@ -51,8 +51,16 @@ export function Header() {
       <div className="custom-container">
         <div className="flex items-center justify-between gap-2 sm:gap-4 py-4">
           {/* Logo - Left */}
-          <Link href="/" className="text-xl font-bold text-white flex-shrink-0">
-            Logo
+          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+            <div className="rounded-lg relative w-32 h-10">
+              <Image
+                src={siteConfig.logo.path}
+                alt={siteConfig.logo.alt}
+                fill
+                className="rounded-lg object-contain"
+              />
+            </div>
+            {/* <span className="text-xl font-bold text-white hidden sm:inline">{siteConfig.name}</span> */}
           </Link>
 
           {/* Desktop Navigation */}

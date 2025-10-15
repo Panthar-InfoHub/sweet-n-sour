@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare, User, Mail, Send } from "lucide-react";
+import { siteConfig } from "@/site.config";
 
 export function ContactForm() {
   const [formData, setFormData] = useState({
@@ -71,7 +72,7 @@ ${formData.message}
 
     const encodedMessage = encodeURIComponent(whatsappMessage);
 
-    const whatsappNumber = "+917268854798";
+    const whatsappNumber = siteConfig.contact.whatsapp;
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
     // Open WhatsApp in a new tab
