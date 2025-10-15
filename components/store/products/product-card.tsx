@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Heart, ShoppingBag, Star } from "lucide-react";
+import { Heart, ShoppingBag, Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -17,6 +17,7 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addItem, removeItem, items } = useCart();
   const { toggleItem, isInWishlistLocal } = useWishlist();
   const selectedVariant = product.variants[selectedVariantIndex];
@@ -41,12 +42,17 @@ export function ProductCard({ product }: ProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (isInCart && cartItem) {
-      // Remove from cart
-      await removeItem(cartItem.id);
-    } else {
-      // Add to cart
-      await addItem(product.id, selectedVariant.weight, product.name, 1);
+    setIsAddingToCart(true);
+    try {
+      if (isInCart && cartItem) {
+        // Remove from cart
+        await removeItem(cartItem.id);
+      } else {
+        // Add to cart
+        await addItem(product.id, selectedVariant.weight, product.name, 1);
+      }
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
@@ -149,13 +155,19 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <Button
             onClick={handleCartAction}
-            disabled={!selectedVariant.inStock}
+            disabled={!selectedVariant.inStock || isAddingToCart}
             variant={isInCart ? "outline" : "default"}
             size="sm"
             className="rounded-full h-8 sm:h-10 px-3 sm:px-4"
           >
-            <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 sm:mr-1" />
-            <span className="hidden sm:inline">{isInCart ? "Remove" : "Add"}</span>
+            {isAddingToCart ? (
+              <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+            ) : (
+              <>
+                <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 sm:mr-1" />
+                <span className="hidden sm:inline">{isInCart ? "Remove" : "Add"}</span>
+              </>
+            )}
           </Button>
         </div>
 

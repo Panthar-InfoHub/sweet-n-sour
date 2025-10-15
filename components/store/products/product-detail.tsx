@@ -11,6 +11,7 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -69,6 +70,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const selectedVariant = product.variants[selectedVariantIndex];
   const isInWishlist = isInWishlistLocal(product.id);
@@ -95,7 +97,12 @@ export function ProductDetail({ product }: ProductDetailProps) {
       return;
     }
 
-    await addItem(product.id, selectedVariant.weight, product.name, quantity);
+    setIsAddingToCart(true);
+    try {
+      await addItem(product.id, selectedVariant.weight, product.name, quantity);
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   const handleToggleWishlist = async () => {
@@ -286,10 +293,19 @@ export function ProductDetail({ product }: ProductDetailProps) {
               size="lg"
               className="flex-1 bg-primary hover:bg-primary-hover"
               onClick={handleAddToCart}
-              disabled={!selectedVariant.inStock}
+              disabled={!selectedVariant.inStock || isAddingToCart}
             >
-              <ShoppingCart className="h-5 w-5 mr-2" />
-              {selectedVariant.inStock ? "Add to Cart" : "Out of Stock"}
+              {isAddingToCart ? (
+                <>
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  {selectedVariant.inStock ? "Add to Cart" : "Out of Stock"}
+                </>
+              )}
             </Button>
             <Button
               size="lg"
