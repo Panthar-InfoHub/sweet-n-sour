@@ -29,18 +29,14 @@ const navigationLinks = [
   },
   {
     label: "Gift & Combos",
-    href: "/products?category=gift-combos",
+    href: "/categories/gift-combos",
   },
   {
     label: "Special Offer",
-    href: "/products?filter=special-offer",
+    href: "/categories/special-offer",
   },
   {
-    label: "Customer Reviews",
-    href: "/reviews",
-  },
-  {
-    label: "Contact",
+    label: "Contact Us",
     href: "/contact",
   },
 ];

@@ -1,6 +1,6 @@
 import type React from "react";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
-import "./globals.css";
+
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/components/providers/cart-provider";
 import { WishlistSync } from "@/components/providers/wishlist-sync";

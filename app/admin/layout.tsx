@@ -4,6 +4,7 @@ import React from "react";
 
 import type { ReactNode } from "react";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import "./globals.css";
 import { Separator } from "@/components/ui/separator";
 import {
   Breadcrumb,
@@ -56,7 +57,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system">
+    <ThemeProvider  attribute="class" defaultTheme="system">
       <SidebarProvider>
         <AdminSidebar />
         <SidebarInset>
