@@ -54,10 +54,10 @@ export function useImageLoader(imagePath: string | undefined, options: UseImageL
       .then((res) => res.json())
       .then((data) => {
         if (data.url) {
-          // Cache for 50 minutes
+          // Cache for 6 days (URLs are valid for 7 days)
           clientUrlCache.set(imagePath, {
             url: data.url,
-            expires: now + 50 * 60 * 1000,
+            expires: now + 6 * 24 * 60 * 60 * 1000,
           });
           setImageUrl(data.url);
         } else {
@@ -137,10 +137,10 @@ export function useImageLoaderBatch(imagePaths: string[], options: UseImageLoade
             const originalPath = pathsToFetch[idx];
             const resultIndex = pathsToFetchIndices[idx];
 
-            // Cache the URL
+            // Cache the URL for 6 days (URLs are valid for 7 days)
             clientUrlCache.set(originalPath, {
               url: url,
-              expires: now + 50 * 60 * 1000,
+              expires: now + 6 * 24 * 60 * 60 * 1000,
             });
 
             results[resultIndex] = url;

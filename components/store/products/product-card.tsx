@@ -157,7 +157,9 @@ export function ProductCard({ product }: ProductCardProps) {
             disabled={!selectedVariant.inStock || isAddingToCart}
             variant={isInCart ? "outline" : "default"}
             size="sm"
-            className={`rounded-full h-8 sm:h-10 px-3 sm:px-4 ${isInCart && "bg-black text-white hover:bg-black/30"}`}
+            className={`rounded-full h-8 sm:h-10 px-4!  ${
+              !isInCart && "bg-black text-white hover:bg-neutral-600!"
+            }`}
           >
             {isAddingToCart ? (
               <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />

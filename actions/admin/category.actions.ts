@@ -4,7 +4,7 @@ import { CategoryFormData, categorySchema } from "@/lib/zod-schema";
 import { prisma } from "@/prisma/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCachedSignedUrl } from "@/lib/image-utils";
+import { getSignedViewUrl } from "@/lib/cloud-storage";
 import { requireAdmin } from "@/lib/admin-auth";
 
 // Validation Schema
@@ -24,7 +24,7 @@ export async function getCategories() {
     // Transform category images to signed URLs
     const categoriesWithSignedUrls = await Promise.all(
       categories.map(async (cat) => {
-        const signedImage = cat.image ? await getCachedSignedUrl(cat.image) : cat.image;
+        const signedImage = cat.image ? await getSignedViewUrl(cat.image) : cat.image;
         return {
           ...cat,
           image: signedImage,
@@ -60,7 +60,7 @@ export async function getCategory(id: string) {
     }
 
     // Transform category image to signed URL
-    const signedImage = category.image ? await getCachedSignedUrl(category.image) : category.image;
+    const signedImage = category.image ? await getSignedViewUrl(category.image) : category.image;
 
     return {
       success: true,
@@ -93,7 +93,7 @@ export async function getCategoryBySlug(slug: string) {
     }
 
     // Transform category image to signed URL
-    const signedImage = category.image ? await getCachedSignedUrl(category.image) : category.image;
+    const signedImage = category.image ? await getSignedViewUrl(category.image) : category.image;
 
     return {
       success: true,

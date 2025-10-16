@@ -28,7 +28,6 @@ export async function getSignedUploadUrl({ filename, contentType }: SignedUrlOpt
   return { url, path: file.name }; // return signed URL + final file path
 }
 
-
 export async function getSignedViewUrl(url: string) {
   try {
     const bucket = storage.bucket(process.env.BUCKET_NAME!);
@@ -38,7 +37,7 @@ export async function getSignedViewUrl(url: string) {
     const [signedUrl] = await file.getSignedUrl({
       version: "v4",
       action: "read",
-      expires: Date.now() + 60 * 60 * 1000, // valid for 1 hour
+      expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // valid for 7 days
     });
 
     return signedUrl;

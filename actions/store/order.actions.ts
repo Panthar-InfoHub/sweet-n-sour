@@ -3,7 +3,7 @@
 import { prisma } from "@/prisma/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { getCachedSignedUrl } from "@/lib/image-utils";
+import { getSignedViewUrl } from "@/lib/cloud-storage";
 
 // Helper function to transform order items with signed URLs
 async function transformOrderItemsWithSignedUrls(items: any[]) {
@@ -11,7 +11,7 @@ async function transformOrderItemsWithSignedUrls(items: any[]) {
     items.map(async (item) => {
       if (item.product?.images && item.product.images.length > 0) {
         const signedImages = await Promise.all(
-          item.product.images.map((img: string) => getCachedSignedUrl(img))
+          item.product.images.map((img: string) => getSignedViewUrl(img))
         );
         return {
           ...item,
