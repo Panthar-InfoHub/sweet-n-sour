@@ -6,6 +6,7 @@ import { getCategories } from "@/actions/admin/category.actions";
 import { ProductGridSkeleton } from "@/components/store/products/product-grid-skeleton";
 import { siteConfig } from "@/site.config";
 import { Metadata } from "next";
+import PageHeader from "@/components/store/common/page-header";
 
 export const metadata: Metadata = {
   title: `All Products - ${siteConfig.title}`,
@@ -60,16 +61,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   return (
     <main className="min-h-screen">
       {/* Page Header */}
-      <div className="bg-gradient-to-b from-primary/10 to-transparent py-8 sm:py-16 border-b border-border bg-[url('/images/checkout-bg.svg')] bg-repeat bg-center">
-        <div className="custom-container">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-2">
-            All Products
-          </h1>
-          <p className="text-center text-muted-foreground text-sm sm:text-base">
-            Discover our handcrafted selection
-          </p>
-        </div>
-      </div>
+      <PageHeader title="All Products" description="Discover our handcrafted selection" />
 
       {/* Products Section */}
       <div className="custom-container py-4 sm:py-8">

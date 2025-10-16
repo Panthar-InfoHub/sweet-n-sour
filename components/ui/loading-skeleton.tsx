@@ -74,10 +74,8 @@ export function CategoryCardSkeleton() {
 // Category Section Skeleton (Carousel)
 export function CategorySectionSkeleton() {
   return (
-    <section className="py-8 sm:py-12">
+    <section className="">
       <div className="custom-container">
-        <Skeleton className="h-8 sm:h-10 md:h-12 w-72 mx-auto mb-8 sm:mb-12  bg-brand-primary/20 " />
-
         {/* Carousel Skeleton */}
         <div className="relative">
           <div className="flex gap-2 sm:gap-4 overflow-hidden">
@@ -92,11 +90,6 @@ export function CategorySectionSkeleton() {
             ))}
           </div>
         </div>
-
-        {/* View All Button Skeleton */}
-        <div className="text-center mt-12">
-          <Skeleton className="h-10 sm:h-12 w-48 mx-auto rounded-full  bg-brand-primary/20 " />
-        </div>
       </div>
     </section>
   );
@@ -105,18 +98,12 @@ export function CategorySectionSkeleton() {
 // Best Sellers Section Skeleton
 export function BestSellersSkeleton() {
   return (
-    <section className="py-8 sm:py-12">
+    <section className="">
       <div className="custom-container">
-        <Skeleton className="h-8 sm:h-10 md:h-12 w-64 mx-auto mb-8 sm:mb-12  bg-brand-primary/20 " />
-
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-12">
           {Array.from({ length: 4 }).map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}
-        </div>
-
-        <div className="text-center">
-          <Skeleton className="h-10 sm:h-12 w-48 mx-auto rounded-full  bg-brand-primary/20 " />
         </div>
       </div>
     </section>

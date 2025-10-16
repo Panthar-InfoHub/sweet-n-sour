@@ -14,7 +14,7 @@ interface AdminUsersPageProps {
 
 export default async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
   // Protect page - only admins can access
-  await requireAdmin();
+  // await requireAdmin();
 
   const params = await searchParams;
 

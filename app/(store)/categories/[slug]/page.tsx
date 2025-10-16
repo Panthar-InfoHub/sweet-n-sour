@@ -6,6 +6,7 @@ import { ProductsGrid } from "@/components/store/products/products-grid";
 import { ProductFilters } from "@/components/store/products/product-filters-server";
 import { ProductGridSkeleton } from "@/components/store/products/product-grid-skeleton";
 import { siteConfig } from "@/site.config";
+import PageHeader from "@/components/store/common/page-header";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -45,17 +46,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   return (
     <main className="min-h-screen">
       {/* Category Header */}
-      <div className="bg-gradient-to-b from-primary/10 to-transparent py-8 sm:py-12 md:py-16 border-b border-border bg-[url('/images/checkout-bg.svg')] bg-repeat bg-center">
-        <div className="custom-container">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-2 sm:mb-4">
-            {category.name}
-          </h1>
-          <p className="text-center text-muted-foreground text-sm sm:text-base md:text-lg">
-            {category.description}
-          </p>
-        </div>
-      </div>
-
+      <PageHeader title={category.name} description={category.description || ""} />
       {/* Products Section */}
       <div className="custom-container py-4 sm:py-8">
         <div className="grid lg:grid-cols-[280px_1fr] gap-8">

@@ -37,8 +37,23 @@ export function MoodSection() {
   const [hoveredBottle, setHoveredBottle] = useState<MoodType>(null);
 
   return (
-    <section className="py-12">
-      <div className="">
+    <section className="py-12 overflow-hidden">
+      <div className=" relative ">
+        <Image
+          src="/images/decor/ginger.svg"
+          alt="Categories"
+          width={50}
+          height={50}
+          className="absolute  top-0 -translate-y-1/2 max-md:translate-x-1/2 right-0  w-36 h-36 object-contain"
+        />
+        <Image
+          src="/images/decor/ginger.svg"
+          alt="Categories"
+          width={50}
+          height={50}
+          className="absolute top-0 -translate-y-1/2 rotate-y-180 max-md:-translate-x-1/2  left-0  w-36 h-36 object-contain"
+        />
+
         <h2 className="text-xl md:text-4xl font-bold text-center mb-4 text-balance">
           What's your mood for the day?
         </h2>

@@ -13,17 +13,24 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/shared/admin-sidebar";
 import SignOut from "@/components/shared/sign-out";
 import ThemeToggle from "@/components/admin/shared/theme-toggle";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { useSession } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { AdminDashboardSkeleton } from "@/components/ui/loading-skeleton";
+import { Button } from "@/components/ui/button";
 
 interface AdminLayoutProps {
   children: ReactNode;
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+
   const pathname = usePathname();
 
   // Generate breadcrumbs from pathname
@@ -33,6 +40,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
     return { href, label };
   });
+
+  if (isPending) {
+    return <AdminDashboardSkeleton />;
+  }
+
+  if (!session || session.user.role !== "ADMIN") {
+    toast.error("Unauthorized");
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <div className="p-4">Unauthorized - 404</div>
+        <Button onClick={() => router.push("/")}>Go to Home</Button>
+      </div>
+    );
+  }
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system">

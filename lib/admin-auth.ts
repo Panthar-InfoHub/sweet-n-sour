@@ -18,7 +18,9 @@ export async function requireAdmin() {
   }
 
   if (session.user.role !== "ADMIN") {
+    // throw new Error("Unauthorized");
     redirect("/");
+ 
   }
 
   return session;

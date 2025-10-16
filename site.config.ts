@@ -13,19 +13,19 @@ export const siteConfig = {
 
   // Contact Information
   contact: {
-    email: "hello@sweetandsour.com",
-    phone: "+91 98765 43210",
-    whatsapp: "919876543210", // Format: country code + number (no spaces or special characters)
-    address: "123 Pickle Street, Food District, Mumbai 400001",
+    email: "hello@sweetnsour.in",
+    phone: "+91 8299319032",
+    whatsapp: "+91 8299319032", // Format: country code + number (no spaces or special characters)
+    address: "Rise incubation, Nagar nigam premises elite square, civil lines, jhansi(up) 284001",
   },
 
   // Social Media Links
   social: {
-    facebook: "https://facebook.com/sweetandsour",
-    instagram: "https://instagram.com/sweetandsour",
-    twitter: "https://twitter.com/sweetandsour",
-    youtube: "https://youtube.com/@sweetandsour",
-    linkedin: "https://linkedin.com/company/sweetandsour",
+    instagram: "https://www.instagram.com/sweetandsour.co7",
+    youtube: "https://www.youtube.com/@pranviiarora",
+    // facebook: "https://facebook.com/sweetandsour",
+    // twitter: "https://twitter.com/sweetandsour",
+    // linkedin: "https://linkedin.com/company/sweetandsour",
   },
 
   // Admin Panel
