@@ -15,7 +15,7 @@ export const siteConfig = {
   contact: {
     email: "hello@sweetnsour.in",
     phone: "+91 8299319032",
-    whatsapp: "+91 8299319032", // Format: country code + number (no spaces or special characters)
+    whatsapp: "+918299319032", // Format: country code + number (no spaces or special characters)
     address: "Rise incubation, Nagar nigam premises elite square, civil lines, jhansi(up) 284001",
   },
 

@@ -75,6 +75,7 @@ ${formData.message}
     const whatsappNumber = siteConfig.contact.whatsapp;
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
+    console.log(whatsappUrl);
     // Open WhatsApp in a new tab
     window.open(whatsappUrl, "_blank");
 
